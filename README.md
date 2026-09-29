@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# arayanindan
 
-## Getting Started
+Ters pazaryeri prototipi: **alıcı ne aradığını ilan eder, portföy sahipleri ona teklif verir.**
+Klasik ilan sitelerinin (sahibinden vb.) vitrin modelinin tersi.
 
-First, run the development server:
+> Bu bir **frontend prototipidir**. Veritabanı, API ve kimlik doğrulama yoktur —
+> tüm veriler `src/lib/data.ts` içindeki mock verilerdir.
+
+## Çalıştırma
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+nvm use            # .nvmrc -> 24.13.0
+npm install
+npm run dev        # http://localhost:8888
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Teknoloji
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Katman | Seçim | Neden |
+|---|---|---|
+| Framework | Next.js 15 (App Router) | SSR/SEO — organik trafik bu üründe hayati |
+| Dil | TypeScript | |
+| UI kütüphanesi | Ant Design 6 | Hazır form/tablo/modal seti, hızlı prototipleme |
+| Stil | Tailwind v4 (preflight kapalı) + özel CSS değişkenleri | antd ile çakışmaması için preflight devre dışı |
+| Font | Inter + Instrument Serif (`next/font`, latin-ext) | Türkçe karakter desteği |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Ekranlar
 
-## Learn More
+| Yol | Taraf | İçerik |
+|---|---|---|
+| `/` | Her ikisi | Değer önerisi, model karşılaştırması, canlı talep vitrini |
+| `/talep/yeni` | Alıcı | 6 adımlı talep sihirbazı + canlı önizleme kartı |
+| `/gelen-kutusu` | Alıcı | Gelen teklifler, kilitli görseller, iletişim açma |
+| `/talepler` | Satıcı | Filtrelenebilir talep akışı, kayıtlı arama |
+| `/talepler/[id]` | Satıcı | Talep detayı, alıcı doğrulaması, teklif verme + jeton akışı |
+| `/panel` | Satıcı | Jeton bakiyesi, teklif geçmişi, dönüşüm hunisi, paketler |
 
-To learn more about Next.js, take a look at the following resources:
+Header'daki **Alıcı / Satıcı** anahtarı iki deneyim arasında geçiş yapar.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## İş modeli (prototipte gösterilen hali)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Satıcı, bir talebe teklif göndermek için **jeton** harcar (talep başına 3–10 jeton).
+- Jeton başı ≈ **₺500**; hacimle ₺390'a iner.
+- Alıcı **48 saat** içinde teklifi görüntülemezse jeton **otomatik iade** edilir.
+  Klasik ilan sitelerinin çözemediği "ölü lead" problemine karşı asıl farklılaştırıcı budur.
+- Aylık sabit ilan ücreti yoktur. Platform kapanıştan komisyon almaz.
 
-## Deploy on Vercel
+## Mimari notlar
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `src/lib/data.ts` — talepler, teklifler, rozet tanımları (tek mock kaynağı)
+- `src/lib/sablonlar.ts` — kategoriye göre kriter şablonları (sihirbaz bunu kullanır)
+- `src/lib/demo-store.tsx` — jeton bakiyesi gibi ekranlar arası paylaşılan demo durumu;
+  gerçek üründe yerini sunucu oturumu + API alacak
+- `src/components/providers.tsx` — antd `ConfigProvider` (koyu tema + altın vurgu) ve tr_TR yerelleştirmesi
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Bilinen sınırlar
+
+- Kalıcılık yok: sayfa yenilenince tüm durum sıfırlanır.
+- Arama/filtreleme istemci tarafında, 15 kayıt üzerinde çalışır.
+- Görseller temsilidir; "kilitli fotoğraf" alanları CSS ile üretilmiştir.
+- Portföy tanımlama ve eşleşme skoru hesaplama akışı yoktur (skorlar mock).
