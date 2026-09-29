@@ -3,6 +3,7 @@ import { Inter, Instrument_Serif } from "next/font/google";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import Providers from "@/components/providers";
 import SiteHeader from "@/components/site-header";
+import GateKapisi from "@/components/gate-kapisi";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,6 +24,8 @@ export const metadata: Metadata = {
   title: "arayanindan — Aradığınızı ilan edin, mülk size gelsin",
   description:
     "Ters pazaryeri: alıcı ne aradığını yazar, portföy sahipleri teklif verir. Mülkünüz vitrine çıkmadan alıcı bulun.",
+  // Kapali erisimde oldugu surece arama motorlarina kapali
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -31,8 +34,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AntdRegistry>
           <Providers>
-            <SiteHeader />
-            <main>{children}</main>
+            <GateKapisi>
+              <SiteHeader />
+              <main>{children}</main>
+            </GateKapisi>
           </Providers>
         </AntdRegistry>
       </body>

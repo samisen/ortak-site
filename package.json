@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "gate:key": "node scripts/gate-key.mjs",
+    "predev": "node scripts/gate-key.mjs",
     "dev": "next dev --port 8888",
+    "prebuild": "node scripts/gate-key.mjs",
     "build": "next build",
     "start": "next start --port 8888",
     "lint": "eslint"

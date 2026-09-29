@@ -42,3 +42,8 @@ next-env.d.ts
 
 # editor / makineye ozel
 .claude/
+
+# erisim kapisi: sifre ve ondan uretilen dosya
+.env
+!.env.example
+/src/lib/gate-key.ts

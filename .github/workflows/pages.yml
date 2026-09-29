@@ -28,11 +28,16 @@ jobs:
 
       - run: npm ci
 
+      # "npx next build" DEGIL: npm'in prebuild kancasi yalnizca "npm run build"
+      # ile calisir ve gate-key.ts'yi uretir. npx ile build gate-key.ts bulamaz.
       - name: Statik export uret
-        run: npx next build
+        run: npm run build
         env:
           # basePath'i /ortak-site olarak acar (next.config.ts)
           GITHUB_PAGES: "true"
+          # Tanimli degilse scripts/gate-key.mjs fallback sifreye duser,
+          # build kirilmaz.
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
 
       - uses: actions/configure-pages@v5
 
