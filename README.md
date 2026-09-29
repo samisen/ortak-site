@@ -14,6 +14,31 @@ npm install
 npm run dev        # http://localhost:8888
 ```
 
+## Yayın (GitHub Pages)
+
+Site statik olarak export edilip GitHub Pages'te yayınlanır:
+**https://samisen.github.io/ortak-site/**
+
+`main` dalına her push'ta `.github/workflows/pages.yml` çalışır, `npx next build`
+ile `out/` üretir ve Pages'e yükler.
+
+Depo ayarlarında **Settings → Pages → Build and deployment → Source** değeri
+**GitHub Actions** olmalıdır ("Deploy from a branch" değil).
+
+Yerelde Pages çıktısını denemek için:
+
+```bash
+GITHUB_PAGES=true npx next build     # out/ uretir, basePath=/ortak-site
+mkdir -p /tmp/p && ln -sfn "$PWD/out" /tmp/p/ortak-site
+cd /tmp/p && python3 -m http.server 8899
+# http://localhost:8899/ortak-site/
+```
+
+Notlar:
+- `basePath` yalnızca `GITHUB_PAGES=true` iken açılır; `npm run dev` kökte çalışmaya devam eder.
+- `public/.nojekyll` şarttır — Jekyll `_next/` gibi alt çizgiyle başlayan dizinleri yok sayar.
+- Tüm rotalar statiktir; `/talepler/[id]` sayfaları `generateStaticParams` ile önceden üretilir.
+
 ## Teknoloji
 
 | Katman | Seçim | Neden |
