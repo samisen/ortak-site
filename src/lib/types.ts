@@ -1,64 +1,85 @@
-export type Kategori = "emlak" | "vasita" | "deniz";
+export type EvTuru = "Taş ev" | "Villa" | "Müstakil ev" | "Daire" | "Arsa";
+export type Bolge = "Alaçatı" | "Çeşme" | "Urla";
 
-export type RozetKod =
-  | "kimlik"      // Kimlik doğrulandı
-  | "butce"       // Bütçe belgelendi
-  | "gecmis"      // Geçmiş işlem
-  | "hizli"       // Hızlı dönüş
-  | "kurumsal"    // Kurumsal üye
-  | "pesin";      // Peşin alıcı
-
-export type Aciliyet = "acil" | "normal" | "firsat";
-export type ParaBirimi = "TRY" | "USD" | "EUR";
-
-export interface Kriter {
-  etiket: string;
-  deger: string;
-  zorunlu: boolean;
+/** Alıcının aradığı özellikler. Tanımsız alan = alıcı bu konuda bir şey istemedi. */
+export interface Kriterler {
+  turler: EvTuru[];
+  semtler: string[];
+  minOda?: number;
+  minAlan?: number;
+  minArsa?: number;
+  maxDeniz?: number;
+  havuz?: boolean;
+  bahce?: boolean;
+  yilBoyu?: boolean;
 }
+
+export type KriterAnahtari = "tur" | "semt" | "oda" | "alan" | "arsa" | "deniz" | "havuz" | "bahce" | "yilBoyu";
+
+/** Talebi kim açtı: alıcının kendisi mi, onu temsil eden emlakçı mı */
+export type Acan = "alici" | "emlakci";
+
+/** Bütçe nasıl doğrulandı */
+export type Dogrulama = "banka" | "kefil";
 
 export interface Talep {
   id: string;
-  kategori: Kategori;
-  tur: string;
-  baslik: string;
-  sehir: string;
-  konum: string;
+  acan: Acan;
+  /** Talebi açanın kendi cümlesi */
+  cumle: string;
+  kriterler: Kriterler;
+  /** Alıcının taviz verebileceğini belirttiği kriterler — bunlar Flex-Match'e girmez */
+  esnek: KriterAnahtari[];
   butceMin: number;
   butceMax: number;
-  paraBirimi: ParaBirimi;
-  odeme: string;
-  kriterler: Kriter[];
-  not: string;
-  rozetler: RozetKod[];
-  aciliyet: Aciliyet;
-  aciliyetMetin: string;
+  pesin: boolean;
+  dogrulama: Dogrulama;
   yayin: string;
-  sonGecerlilik: string;
-  goruntuleme: number;
-  teklifSayisi: number;
-  izleyen: number;
-  tokenMaliyeti: number;
-  aliciKod: string;
-  uyum: number;
+  bitis: string;
+  /** Başka emlakçıların doldurduğu koltuk sayısı (0-3) */
+  koltukDolu: number;
+}
+
+export interface Portfoy {
+  id: string;
+  baslik: string;
+  tur: EvTuru;
+  semt: string;
+  oda: number;
+  alan: number;
+  arsa?: number;
+  /** Denize mesafe, metre */
+  deniz: number;
+  havuz: boolean;
+  bahce: boolean;
+  yilBoyu: boolean;
+  fiyat: number;
+  fotoAdet: number;
+}
+
+export interface Emlakci {
+  kod: string;
+  ad: string;
+  kurum: string;
+  /** Tekliflerinin alıcılar tarafından kabul edilme oranı, % */
+  kabulOrani: number;
+  kurucu: boolean;
+  telefon: string;
 }
 
 export interface Teklif {
   id: string;
   talepId: string;
-  saticiKod: string;
-  saticiTip: "kurumsal" | "bireysel";
-  saticiRozetler: string[];
-  saticiIsim?: string;
-  saticiTelefon?: string;
-  baslik: string;
-  fiyat: number;
-  paraBirimi: ParaBirimi;
-  konum: string;
-  ozellikler: string[];
-  mesaj: string;
-  fotoAdet: number;
-  uyum: number;
+  portfoy: Portfoy;
+  emlakci: Emlakci;
+  not: string;
   tarih: string;
-  durum: "yeni" | "incelendi" | "acildi" | "reddedildi";
+}
+
+/** Bir kriterde istenenle sunulan arasındaki fark */
+export interface Fark {
+  anahtar: KriterAnahtari | "fiyat";
+  etiket: string;
+  istenen: string;
+  sunulan: string;
 }

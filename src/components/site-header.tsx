@@ -2,138 +2,109 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Button, Segmented, Tooltip, Badge } from "antd";
-import { PlusOutlined, ThunderboltFilled, SunOutlined, MoonFilled } from "@ant-design/icons";
-import { ALICI } from "@/lib/data";
-import { useDemo } from "@/lib/demo-store";
+import { Button, Segmented, Tooltip } from "antd";
+import { MoonFilled, SunOutlined } from "@ant-design/icons";
 import { useTema } from "@/lib/tema";
+import { DEMO_ALICI, DEMO_EMLAKCI } from "@/lib/data";
 
-type Persona = "alici" | "satici";
+type Rol = "alici" | "emlakci";
 
-const ALICI_YOLLARI = ["/talep/yeni", "/gelen-kutusu"];
+const EMLAKCI_NAV = [
+  { href: "/emlakci", etiket: "Talepler", tam: true },
+  { href: "/emlakci/panel", etiket: "Panel" },
+  { href: "/emlakci/talep-ac", etiket: "Müşterim adına talep" },
+];
 
-const NAV: Record<Persona, { href: string; etiket: string }[]> = {
-  alici: [
-    { href: "/talep/yeni", etiket: "Talep oluştur" },
-    { href: "/gelen-kutusu", etiket: "Gelen kutusu" },
-    { href: "/talepler", etiket: "Tüm talepler" },
-  ],
-  satici: [
-    { href: "/talepler", etiket: "Talep akışı" },
-    { href: "/panel", etiket: "Panelim" },
-  ],
-};
-
-/** Persona yoldan türetilir — böylece sunucu ve istemci hep aynı şeyi çizer */
-function personaBul(yol: string): Persona {
-  return ALICI_YOLLARI.some((y) => yol.startsWith(y)) ? "alici" : "satici";
+function Logo({ rol }: { rol: Rol }) {
+  return (
+    <Link href={rol === "emlakci" ? "/emlakci" : "/"} className="display flex shrink-0 items-baseline gap-2 text-[21px] no-underline">
+      <span>
+        <span style={{ color: "var(--color-cream)" }}>arayan</span>
+        <span style={{ color: "var(--color-gold)" }}>indan</span>
+      </span>
+      {rol === "emlakci" && (
+        <span className="overline" style={{ fontFamily: "var(--font-sans)", color: "var(--color-muted)" }}>Emlakçı</span>
+      )}
+    </Link>
+  );
 }
 
 export default function SiteHeader() {
   const yol = usePathname();
   const router = useRouter();
-  const persona = personaBul(yol);
-  const { jeton } = useDemo();
+  const rol: Rol = yol.startsWith("/emlakci") ? "emlakci" : "alici";
   const { tema, ayarla } = useTema();
+
+  const temaDugmesi = (
+    <Tooltip title={tema === "dark" ? "Açık temaya geç" : "Koyu temaya geç"}>
+      <Button
+        type="text"
+        shape="circle"
+        aria-label={tema === "dark" ? "Açık temaya geç" : "Koyu temaya geç"}
+        onClick={() => ayarla(tema === "dark" ? "light" : "dark")}
+        icon={tema === "dark" ? <SunOutlined style={{ fontSize: 15 }} /> : <MoonFilled style={{ fontSize: 14 }} />}
+      />
+    </Tooltip>
+  );
+
+  const rolDugmesi = (
+    <Tooltip title="Demo: iki taraf ayrı hesaplardır, burada geçiş için birleştirildi">
+      <Segmented
+        size="small"
+        value={rol}
+        onChange={(v) => router.push(v === "emlakci" ? "/emlakci" : "/hesabim")}
+        options={[
+          { label: "Alıcı", value: "alici" },
+          { label: "Emlakçı", value: "emlakci" },
+        ]}
+      />
+    </Tooltip>
+  );
 
   return (
     <header
       className="sticky top-0 z-50"
-      style={{
-        background: "var(--header-bg)",
-        backdropFilter: "blur(14px)",
-        borderBottom: "1px solid var(--color-line)",
-      }}
+      style={{ background: "var(--header-bg)", backdropFilter: "blur(14px)", borderBottom: "1px solid var(--color-line)" }}
     >
-      <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-6 px-5">
-        <Link href="/" className="display shrink-0 text-[21px] no-underline">
-          <span style={{ color: "var(--color-cream)" }}>arayan</span>
-          <span style={{ color: "var(--color-gold)" }}>indan</span>
-        </Link>
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-6 px-5">
+        <Logo rol={rol} />
 
-        <nav className="hidden items-center gap-1 md:flex">
-          {NAV[persona].map((n) => {
-            const aktif = yol === n.href || (n.href !== "/" && yol.startsWith(n.href));
-            return (
-              <Link
-                key={n.href}
-                href={n.href}
-                className="rounded-lg px-3 py-1.5 text-[13.5px] no-underline transition-colors"
-                style={{
-                  color: aktif ? "var(--color-cream)" : "var(--color-muted)",
-                  background: aktif ? "var(--color-surface-2)" : "transparent",
-                }}
-              >
-                {n.etiket}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-3">
-          <Tooltip title={tema === "dark" ? "Açık temaya geç" : "Koyu temaya geç"}>
-            <Button
-              type="text"
-              shape="circle"
-              aria-label={tema === "dark" ? "Açık temaya geç" : "Koyu temaya geç"}
-              onClick={() => ayarla(tema === "dark" ? "light" : "dark")}
-              icon={
-                tema === "dark" ? (
-                  <SunOutlined style={{ fontSize: 15 }} />
-                ) : (
-                  <MoonFilled style={{ fontSize: 14 }} />
-                )
-              }
-            />
-          </Tooltip>
-
-          <Tooltip title="Demo için taraf değiştirin — ürün iki farklı deneyim sunuyor">
-            <Segmented
-              size="small"
-              value={persona}
-              onChange={(v) => router.push(v === "alici" ? "/talep/yeni" : "/talepler")}
-              options={[
-                { label: "Alıcı", value: "alici" },
-                { label: "Satıcı", value: "satici" },
-              ]}
-            />
-          </Tooltip>
-
-          {persona === "satici" ? (
-            <>
-              <Tooltip title="Jeton bakiyeniz — iletişim açmak için harcanır, dönüş olmazsa iade edilir">
+        {rol === "emlakci" && (
+          <nav className="hidden items-center gap-1 md:flex">
+            {EMLAKCI_NAV.map((n) => {
+              const aktif = n.tam ? yol === n.href || yol.startsWith("/emlakci/talep/") : yol.startsWith(n.href);
+              return (
                 <Link
-                  href="/panel"
-                  className="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] no-underline sm:flex"
-                  style={{ background: "var(--color-surface-2)", border: "1px solid var(--color-line)" }}
+                  key={n.href}
+                  href={n.href}
+                  className="rounded-lg px-3 py-1.5 text-[13.5px] no-underline"
+                  style={{ color: aktif ? "var(--color-cream)" : "var(--color-muted)", background: aktif ? "var(--color-surface-2)" : "transparent" }}
                 >
-                  <ThunderboltFilled style={{ color: "var(--color-gold)", fontSize: 12 }} />
-                  <span className="num" style={{ color: "var(--color-cream)" }}>{jeton}</span>
-                  <span style={{ color: "var(--color-faint)" }}>jeton</span>
+                  {n.etiket}
                 </Link>
-              </Tooltip>
-              <Link href="/talepler">
-                <Button type="primary">Talepleri gör</Button>
+              );
+            })}
+          </nav>
+        )}
+
+        <div className="ml-auto flex items-center gap-2.5">
+          {rol === "alici" ? (
+            <>
+              <Link href="/hesabim" className="hidden rounded-lg px-3 py-1.5 text-[13.5px] no-underline sm:block" style={{ color: yol === "/hesabim" ? "var(--color-cream)" : "var(--color-muted)" }}>
+                Taleplerim
               </Link>
+              <span className="num hidden md:inline" style={{ fontSize: 12, color: "var(--color-faint)" }}>{DEMO_ALICI.kod}</span>
             </>
           ) : (
-            <>
-              <Badge count={ALICI.okunmamis} size="small" offset={[-2, 2]}>
-                <Link
-                  href="/gelen-kutusu"
-                  className="hidden rounded-lg px-2.5 py-1.5 text-[13px] no-underline sm:block"
-                  style={{ background: "var(--color-surface-2)", border: "1px solid var(--color-line)", color: "var(--color-muted)" }}
-                >
-                  Teklifler
-                </Link>
-              </Badge>
-              <Link href="/talep/yeni">
-                <Button type="primary" icon={<PlusOutlined />}>
-                  Talep oluştur
-                </Button>
-              </Link>
-            </>
+            <Tooltip title="Tekliflerinizin alıcılar tarafından ilgi görme oranı. %70 üstü, yeni taleplere ilk 24 saat erken erişim sağlar.">
+              <span className="num hidden items-center gap-1.5 rounded-lg px-2.5 py-1 sm:inline-flex" style={{ fontSize: 12.5, background: "var(--color-surface-2)", border: "1px solid var(--color-line)", color: "var(--color-muted)" }}>
+                <span style={{ color: "var(--color-cream)", fontWeight: 600 }}>%{DEMO_EMLAKCI.kabulOrani}</span> kabul
+                {DEMO_EMLAKCI.kurucu && <span style={{ color: "var(--color-gold)" }}>· kurucu</span>}
+              </span>
+            </Tooltip>
           )}
+          {temaDugmesi}
+          {rolDugmesi}
         </div>
       </div>
     </header>

@@ -131,6 +131,9 @@ body {
 
 ::selection { background: var(--accent-wash-2); color: var(--color-cream); }
 
+/* Preflight kapalı: yerel form öğeleri sayfa fontunu kendiliğinden devralmaz */
+button { font-family: inherit; }
+
 /* Tema geçişini yumuşat — ama kullanıcı hareketi azaltmayı seçtiyse hayır */
 @media (prefers-reduced-motion: no-preference) {
   body, .panel, .panel-2 { transition: background-color .22s ease, border-color .22s ease, color .22s ease; }

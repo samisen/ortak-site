@@ -1,54 +1,44 @@
-import type { ParaBirimi } from "./types";
+/** Prototipin "bugün"ü — tüm süre hesapları buna göre yapılır */
+export const BUGUN = new Date("2026-09-30T12:00:00+03:00");
 
-export const SEMBOL: Record<ParaBirimi, string> = { TRY: "₺", USD: "$", EUR: "€" };
-
-/** 85000000 -> "85 Mn"  |  260000 -> "260 B" */
+/** 85000000 -> "85 Mn" · 49500000 -> "49,5 Mn" */
 export function kisaSayi(n: number): string {
   if (n >= 1_000_000) {
     const v = n / 1_000_000;
-    return `${v % 1 === 0 ? v : v.toFixed(1).replace(".", ",")} Mn`;
+    return `${Number.isInteger(v) ? v : v.toFixed(1).replace(".", ",")} Mn`;
   }
-  if (n >= 1_000) {
-    const v = n / 1_000;
-    return `${v % 1 === 0 ? v : v.toFixed(0)} B`;
-  }
+  if (n >= 1_000) return `${Math.round(n / 1_000)} B`;
   return String(n);
 }
 
-export function para(n: number, pb: ParaBirimi): string {
-  return `${SEMBOL[pb]}${n.toLocaleString("tr-TR")}`;
+export const tl = (n: number) => `₺${n.toLocaleString("tr-TR")}`;
+export const tlKisa = (n: number) => `₺${kisaSayi(n)}`;
+export const metre = (n: number) => `${n.toLocaleString("tr-TR")} m`;
+
+/** "₺50 – 60 Mn" */
+export function butceAralik(min: number, max: number): string {
+  const a = kisaSayi(min), b = kisaSayi(max);
+  const birim = a.split(" ")[1];
+  if (birim && b.endsWith(birim)) return `₺${a.split(" ")[0]} – ${b}`;
+  return `₺${a} – ₺${b}`;
 }
 
-export function paraKisa(n: number, pb: ParaBirimi): string {
-  return `${SEMBOL[pb]}${kisaSayi(n)}`;
-}
-
-/** "₺85 – 120 Mn" — aynı birimdeyse tekrar etmez */
-export function butceAralik(min: number, max: number, pb: ParaBirimi): string {
-  const bMin = kisaSayi(min);
-  const bMax = kisaSayi(max);
-  const birim = bMin.split(" ")[1];
-  if (birim && bMax.endsWith(birim)) {
-    return `${SEMBOL[pb]}${bMin.split(" ")[0]} – ${bMax}`;
-  }
-  return `${SEMBOL[pb]}${bMin} – ${SEMBOL[pb]}${bMax}`;
-}
-
-const BUGUN = new Date("2026-09-29T12:00:00");
-
-export function gecenSure(iso: string): string {
-  const fark = Math.floor((BUGUN.getTime() - new Date(iso).getTime()) / 86400000);
-  if (fark <= 0) return "bugün";
-  if (fark === 1) return "dün";
-  if (fark < 7) return `${fark} gün önce`;
-  if (fark < 30) return `${Math.floor(fark / 7)} hafta önce`;
-  return `${Math.floor(fark / 30)} ay önce`;
-}
+const GUN = 86_400_000;
 
 export function kalanGun(iso: string): number {
-  return Math.max(0, Math.ceil((new Date(iso).getTime() - BUGUN.getTime()) / 86400000));
+  return Math.max(0, Math.ceil((new Date(iso).getTime() - BUGUN.getTime()) / GUN));
 }
 
-export function tarihTR(iso: string): string {
-  return new Date(iso).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+export function gecenSaat(iso: string): number {
+  return Math.max(0, Math.floor((BUGUN.getTime() - new Date(iso).getTime()) / 3_600_000));
+}
+
+export function gecenSure(iso: string): string {
+  const saat = gecenSaat(iso);
+  if (saat < 1) return "az önce";
+  if (saat < 24) return `${saat} sa önce`;
+  const gun = Math.floor(saat / 24);
+  if (gun === 1) return "dün";
+  if (gun < 7) return `${gun} gün önce`;
+  return `${Math.floor(gun / 7)} hafta önce`;
 }

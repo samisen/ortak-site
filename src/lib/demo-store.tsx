@@ -1,40 +1,97 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
-import { SATICI } from "./data";
+import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
+import type { Talep } from "./types";
+import type { TaslakTalep } from "./ayristir";
+import { BUGUN } from "./format";
+import { TALEPLER } from "./data";
 
 /**
- * Prototip boyunca tarayıcıda yaşayan tek ortak durum.
- * Gerçek üründe bunun yerine sunucu tarafı oturum + API gelecek.
+ * Prototip boyunca tarayıcı belleğinde yaşayan ortak durum. Sayfa yenilenince
+ * sıfırlanır. Gerçek üründe yerini sunucu oturumu ve API alacak.
  */
+
+export type AliciKarari = "baglandi" | "ilgilenmiyor" | "farki-gordu";
+
+export interface GonderilenTeklif {
+  talepId: string;
+  portfoyId: string;
+  tip: "tam" | "esnek";
+  not: string;
+}
+
 interface DemoDurum {
-  jeton: number;
-  harca: (adet: number) => void;
-  yukle: (adet: number) => void;
-  verilenTeklifler: string[];
-  teklifEkle: (talepId: string) => void;
+  gonderilenler: GonderilenTeklif[];
+  teklifGonder: (t: GonderilenTeklif) => void;
+
+  kararlar: Record<string, AliciKarari>;
+  redSebepleri: Record<string, string>;
+  kararVer: (teklifId: string, karar: AliciKarari, sebep?: string) => void;
+
+  /** Bu oturumda açılan talepler (alıcı ya da emlakçı tarafından) */
+  yeniTalepler: Talep[];
+  talepAc: (taslak: TaslakTalep, acan: Talep["acan"], dogrulama?: Talep["dogrulama"]) => string;
+
+  /** Mock + yeni talepler birlikte */
+  tumTalepler: Talep[];
+  /** Mock doluluk + bu oturumda gönderilen teklifler */
+  koltukDolu: (talepId: string) => number;
 }
 
 const Ctx = createContext<DemoDurum | null>(null);
 
 export function DemoSaglayici({ children }: { children: ReactNode }) {
-  const [jeton, setJeton] = useState(SATICI.token);
-  const [verilenTeklifler, setVerilenTeklifler] = useState<string[]>([]);
+  const [gonderilenler, setGonderilenler] = useState<GonderilenTeklif[]>([]);
+  const [kararlar, setKararlar] = useState<Record<string, AliciKarari>>({});
+  const [redSebepleri, setRedSebepleri] = useState<Record<string, string>>({});
+  const [yeniTalepler, setYeniTalepler] = useState<Talep[]>([]);
 
-  return (
-    <Ctx.Provider
-      value={{
-        jeton,
-        harca: (adet) => setJeton((j) => Math.max(0, j - adet)),
-        yukle: (adet) => setJeton((j) => j + adet),
-        verilenTeklifler,
-        teklifEkle: (talepId) =>
-          setVerilenTeklifler((p) => (p.includes(talepId) ? p : [...p, talepId])),
-      }}
-    >
-      {children}
-    </Ctx.Provider>
+  const teklifGonder = useCallback((t: GonderilenTeklif) => {
+    setGonderilenler((p) => (p.some((x) => x.talepId === t.talepId) ? p : [...p, t]));
+  }, []);
+
+  const kararVer = useCallback((id: string, karar: AliciKarari, sebep?: string) => {
+    setKararlar((p) => ({ ...p, [id]: karar }));
+    if (sebep) setRedSebepleri((p) => ({ ...p, [id]: sebep }));
+  }, []);
+
+  const sayac = useRef(0);
+  const talepAc = useCallback((taslak: TaslakTalep, acan: Talep["acan"], dogrulama?: Talep["dogrulama"]) => {
+    const id = `T-${(460 + sayac.current++).toString().padStart(4, "0")}`;
+    const t: Talep = {
+      id,
+      acan,
+      cumle: taslak.cumle,
+      kriterler: taslak.kriterler,
+      esnek: taslak.esnek,
+      butceMin: taslak.butceMin ?? 0,
+      butceMax: taslak.butceMax ?? 0,
+      pesin: taslak.pesin,
+      dogrulama: dogrulama ?? (acan === "emlakci" ? "kefil" : "banka"),
+      yayin: BUGUN.toISOString(),
+      bitis: new Date(BUGUN.getTime() + 90 * 86_400_000).toISOString(),
+      koltukDolu: 0,
+    };
+    setYeniTalepler((p) => [t, ...p]);
+    return id;
+  }, []);
+
+  const tumTalepler = useMemo(() => [...yeniTalepler, ...TALEPLER], [yeniTalepler]);
+
+  const koltukDolu = useCallback(
+    (talepId: string) => {
+      const taban = tumTalepler.find((t) => t.id === talepId)?.koltukDolu ?? 0;
+      return taban + gonderilenler.filter((g) => g.talepId === talepId).length;
+    },
+    [tumTalepler, gonderilenler]
   );
+
+  const deger = useMemo<DemoDurum>(
+    () => ({ gonderilenler, teklifGonder, kararlar, redSebepleri, kararVer, yeniTalepler, talepAc, tumTalepler, koltukDolu }),
+    [gonderilenler, teklifGonder, kararlar, redSebepleri, kararVer, yeniTalepler, talepAc, tumTalepler, koltukDolu]
+  );
+
+  return <Ctx.Provider value={deger}>{children}</Ctx.Provider>;
 }
 
 export function useDemo(): DemoDurum {

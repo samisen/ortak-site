@@ -57,7 +57,7 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
       <div className="relative z-10 w-full" style={{ maxWidth: 380 }}>
         <div className="mb-8 text-center">
           <Logo boyut={30} />
-          <div className="overline mt-3">Kapali erisim</div>
+          <div className="overline mt-3">Kapalı erişim</div>
         </div>
 
         <div className="panel p-7">
@@ -77,8 +77,8 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
             className="mb-6 text-center"
             style={{ fontSize: 13.5, lineHeight: 1.65, color: "var(--color-muted)", margin: "0 0 24px" }}
           >
-            Bu prototip henuz herkese acik degil. Devam etmek icin erisim
-            sifresini girin.
+            Bu prototip henüz herkese açık değil. Devam etmek için erişim
+            şifresini girin.
           </p>
 
           {kullanilamaz ? (
@@ -91,10 +91,10 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
             >
               <WarningOutlined style={{ color: "var(--warn-fg)", fontSize: 14, marginTop: 2 }} />
               <span style={{ fontSize: 12.5, lineHeight: 1.6, color: "var(--color-muted)" }}>
-                Tarayici sifreleme API&apos;si kullanilamiyor. Siteyi{" "}
+                Tarayıcının şifreleme arayüzü kullanılamıyor. Siteyi{" "}
                 <strong style={{ color: "var(--color-cream)", fontWeight: 500 }}>https</strong> veya{" "}
                 <strong style={{ color: "var(--color-cream)", fontWeight: 500 }}>localhost</strong>{" "}
-                uzerinden acin — LAN IP adresiyle (http://192.168…) calismaz.
+                üzerinden açın; yerel ağ IP adresiyle (http://192.168…) çalışmaz.
               </span>
             </div>
           ) : (
@@ -103,7 +103,7 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
                 size="large"
                 autoFocus
                 value={sifre}
-                placeholder="Erisim sifresi"
+                placeholder="Erişim şifresi"
                 status={hata ? "error" : undefined}
                 onChange={(e) => {
                   setSifre(e.target.value);
@@ -115,7 +115,7 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
               <div style={{ minHeight: 22, paddingTop: 8 }}>
                 {hata && (
                   <span style={{ fontSize: 12.5, color: "var(--err-fg)" }}>
-                    Sifre hatali. Tekrar deneyin.
+                    Şifre hatalı. Tekrar deneyin.
                   </span>
                 )}
               </div>
@@ -129,7 +129,7 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
                 disabled={!sifre}
                 style={{ height: 46, marginTop: 4 }}
               >
-                {kontrolEdiliyor ? "Dogrulaniyor" : "Giris yap"}
+                {kontrolEdiliyor ? "Doğrulanıyor" : "Giriş yap"}
               </Button>
             </form>
           )}
@@ -139,7 +139,7 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
           className="mt-6 text-center"
           style={{ fontSize: 11.5, lineHeight: 1.6, color: "var(--color-faint)", margin: "24px 0 0" }}
         >
-          Sifreyi bilmiyorsaniz proje ekibinden isteyin.
+          Şifreyi bilmiyorsanız proje ekibinden isteyin.
         </p>
       </div>
     </div>

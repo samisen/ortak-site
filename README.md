@@ -1,7 +1,11 @@
 # arayanindan
 
-Ters pazaryeri prototipi: **alıcı ne aradığını ilan eder, portföy sahipleri ona teklif verir.**
-Klasik ilan sitelerinin (sahibinden vb.) vitrin modelinin tersi.
+Ters pazaryeri prototipi: **alıcı ne aradığını söyler, portföyünde uyan mülk olan emlakçılar ona teklif getirir.**
+Pilot bölge Çeşme, Alaçatı ve Urla; yalnızca emlak.
+
+Talebi alıcının kendisi de açabilir, onu temsil eden emlakçı da. Pilotun motoru ikincisi:
+emlakçıların bugün WhatsApp gruplarında yaptığı "müşterim var, elinde olan?" paslaşmasının
+doğrulanmış ve gizli hali.
 
 > Bu bir **frontend prototipidir**. Veritabanı, API ve kimlik doğrulama yoktur —
 > tüm veriler `src/lib/data.ts` içindeki mock verilerdir.
@@ -125,34 +129,47 @@ Notlar:
 
 | Yol | Taraf | İçerik |
 |---|---|---|
-| `/` | Her ikisi | Değer önerisi, model karşılaştırması, canlı talep vitrini |
-| `/talep/yeni` | Alıcı | 6 adımlı talep sihirbazı + canlı önizleme kartı |
-| `/gelen-kutusu` | Alıcı | Gelen teklifler, kilitli görseller, iletişim açma |
-| `/talepler` | Satıcı | Filtrelenebilir talep akışı, kayıtlı arama |
-| `/talepler/[id]` | Satıcı | Talep detayı, alıcı doğrulaması, teklif verme + jeton akışı |
-| `/panel` | Satıcı | Jeton bakiyesi, teklif geçmişi, dönüşüm hunisi, paketler |
+| `/` | Alıcı | Tek satır: "Ne arıyorsunuz?" (yazı ya da temsili sesli giriş) |
+| `/talep/onay` | Alıcı | Ayrıştırılan talebin özeti; çipe tıklayınca şart ↔ esnek; bütçe doğrulama |
+| `/hesabim` | Alıcı | Kendi talepleri, gelen teklifler (tam + esnek ön kart), Piyasa Nabzı |
+| `/emlakci` | Emlakçı | Talep akışı: bütçe, koltuklar, erken erişim, "portföyünüzde uyan" |
+| `/emlakci/talep/[id]` | Emlakçı | Talep detayı, portföyden teklif, Flex-Match, bağlantı ücreti |
+| `/emlakci/panel` | Emlakçı | Teklifler ve ücret durumu, müşterilerin talepleri, portföy |
+| `/emlakci/talep-ac` | Emlakçı | Müşteri adına talep açma + kefalet |
 
-Header'daki **Alıcı / Satıcı** anahtarı iki deneyim arasında geçiş yapar.
+Header'daki **Alıcı / Emlakçı** anahtarı iki deneyim arasında geçiş yapar (gerçek üründe ayrı hesaplar).
 
-## İş modeli (prototipte gösterilen hali)
+## Ürün kuralları (prototipte uygulanan hali)
 
-- Satıcı, bir talebe teklif göndermek için **jeton** harcar (talep başına 3–10 jeton).
-- Jeton başı ≈ **₺500**; hacimle ₺390'a iner.
-- Alıcı **48 saat** içinde teklifi görüntülemezse jeton **otomatik iade** edilir.
-  Klasik ilan sitelerinin çözemediği "ölü lead" problemine karşı asıl farklılaştırıcı budur.
-- Aylık sabit ilan ücreti yoktur. Platform kapanıştan komisyon almaz.
+Kuralların tamamı `src/lib/eslesme.ts` içinde sabit olarak durur.
+
+- **Bağlantıda ücret.** Emlakçı yalnızca alıcı "ilgileniyorum" deyip iletişim karşılıklı
+  açıldığında öder. Alıcı görmez, cevapsız bırakır ya da ilgilenmezse hiçbir şey ödenmez.
+  Ücret talep bütçesinin ortasının binde yarımı (60M'lik talepte ₺30.000). Kurucu üyelere ilk 6 ay ₺0.
+- **Koltuk.** Bir talebe en fazla 3 emlakçı teklif verebilir; reddedilen teklif koltuğu boşaltır.
+- **Erken erişim.** Yeni talep ilk 24 saat yalnızca kabul oranı %70 üstündeki emlakçılara açılır.
+- **Flex-Match.** Zorunlu kriterlerden yalnızca birini karşılamayan mülkle esnek teklif verilebilir.
+  Alıcıya önce yalnızca o fark gösterilir; görmek isterse teklif açılır. Fiyat da bir kriterdir:
+  bütçenin %12'sine kadar üstü esnek teklif sayılır.
+- **Eşleşme gerçek.** Uyum oranları ve "portföyünüzde uyan" sayıları, emlakçının portföyü ile
+  talebin kriterleri karşılaştırılarak hesaplanır; rastgele değildir.
+- **Piyasa Nabzı eşiği.** Bir bölgede 5 talepten az varsa o bölgenin rakamları gösterilmez;
+  az sayıda talepte rakamlar kişileri ele verebilir.
+- **Filigran.** Teklif fotoğrafları görüntüleyenin koduyla filigranlanır.
 
 ## Mimari notlar
 
-- `src/lib/data.ts` — talepler, teklifler, rozet tanımları (tek mock kaynağı)
-- `src/lib/sablonlar.ts` — kategoriye göre kriter şablonları (sihirbaz bunu kullanır)
-- `src/lib/demo-store.tsx` — jeton bakiyesi gibi ekranlar arası paylaşılan demo durumu;
+- `src/lib/data.ts` — talepler, demo emlakçının portföyü, gelen teklifler (tek mock kaynağı)
+- `src/lib/eslesme.ts` — eşleştirme motoru ve ürün kuralları (koltuk, ücret, Flex-Match, erken erişim)
+- `src/lib/ayristir.ts` — tek satırı yapılandırılmış talebe çeviren temsili ayrıştırıcı
+- `src/lib/demo-store.tsx` — gönderilen teklifler, alıcı kararları, yeni talepler;
   gerçek üründe yerini sunucu oturumu + API alacak
-- `src/components/providers.tsx` — antd `ConfigProvider` (koyu tema + altın vurgu) ve tr_TR yerelleştirmesi
+- `src/components/providers.tsx` — antd `ConfigProvider` (açık/koyu tema) ve tr_TR yerelleştirmesi
 
 ## Bilinen sınırlar
 
-- Kalıcılık yok: sayfa yenilenince tüm durum sıfırlanır.
-- Arama/filtreleme istemci tarafında, 15 kayıt üzerinde çalışır.
-- Görseller temsilidir; "kilitli fotoğraf" alanları CSS ile üretilmiştir.
-- Portföy tanımlama ve eşleşme skoru hesaplama akışı yoktur (skorlar mock).
+- Kalıcılık yok: sayfa yenilenince demo sırasında yapılan her şey sıfırlanır.
+- Ayrıştırma kural tabanlı ve temsilidir; gerçek üründe bir LLM yapacak (sunucu gerekir).
+- Ses girişi temsilidir: mikrofona basınca örnek bir cümle yazılır.
+- Belge yükleme ve doğrulama temsilidir; hiçbir dosya bir yere gönderilmez.
+- Görseller CSS ile üretilmiş yer tutuculardır.
