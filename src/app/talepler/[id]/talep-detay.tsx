@@ -95,9 +95,9 @@ export default function TalepDetay({ id }: { id: string }) {
                 className="rounded px-2 py-0.5"
                 style={{
                   fontSize: 11,
-                  background: talep.aciliyet === "acil" ? "rgba(196,112,63,.12)" : "var(--color-surface-3)",
-                  border: `1px solid ${talep.aciliyet === "acil" ? "rgba(196,112,63,.32)" : "var(--color-line)"}`,
-                  color: talep.aciliyet === "acil" ? "#D98C5A" : "var(--color-muted)",
+                  background: talep.aciliyet === "acil" ? "var(--warn-wash)" : "var(--color-surface-3)",
+                  border: `1px solid ${talep.aciliyet === "acil" ? "var(--warn-line)" : "var(--color-line)"}`,
+                  color: talep.aciliyet === "acil" ? "var(--warn-fg)" : "var(--color-muted)",
                 }}
               >
                 {talep.aciliyetMetin}
@@ -168,7 +168,7 @@ export default function TalepDetay({ id }: { id: string }) {
               type="info"
               showIcon
               icon={<SafetyCertificateOutlined />}
-              style={{ background: "rgba(200,163,74,.06)", border: "1px solid rgba(200,163,74,.2)" }}
+              style={{ background: "var(--accent-wash)", border: "1px solid var(--accent-line)" }}
               title={
                 <span style={{ fontSize: 12.5, color: "var(--color-muted)" }}>
                   Alıcının kimliği, iletişim bilgisi ve tam adresi <strong style={{ color: "var(--color-cream)", fontWeight: 500 }}>teklifiniz
@@ -277,7 +277,7 @@ export default function TalepDetay({ id }: { id: string }) {
               {gonderildi ? (
                 <div
                   className="flex items-center gap-2.5 rounded-lg px-3.5 py-3"
-                  style={{ background: "rgba(90,169,123,.08)", border: "1px solid rgba(90,169,123,.28)" }}
+                  style={{ background: "var(--ok-wash)", border: "1px solid var(--ok-line)" }}
                 >
                   <CheckCircleFilled style={{ color: "var(--color-verified)" }} />
                   <span style={{ fontSize: 13, color: "var(--color-cream)" }}>Teklifiniz iletildi</span>
@@ -451,8 +451,8 @@ export default function TalepDetay({ id }: { id: string }) {
                           className="cursor-pointer rounded-lg px-3 py-2 text-left transition-colors"
                           style={{
                             fontSize: 12.5,
-                            background: secili ? "rgba(200,163,74,.1)" : "var(--color-surface-2)",
-                            border: `1px solid ${secili ? "rgba(200,163,74,.34)" : "var(--color-line)"}`,
+                            background: secili ? "var(--accent-wash-2)" : "var(--color-surface-2)",
+                            border: `1px solid ${secili ? "var(--accent-line-2)" : "var(--color-line)"}`,
                             color: secili ? "var(--color-gold-soft)" : "var(--color-muted)",
                           }}
                         >
@@ -490,7 +490,7 @@ export default function TalepDetay({ id }: { id: string }) {
                   className="mb-4"
                   type="warning"
                   showIcon
-                  style={{ background: "rgba(196,112,63,.07)", border: "1px solid rgba(196,112,63,.25)" }}
+                  style={{ background: "var(--warn-wash)", border: "1px solid var(--warn-line)" }}
                   title={
                     <span style={{ fontSize: 12.5, color: "var(--color-muted)" }}>
                       Mesajınıza telefon, e-posta veya dış bağlantı eklemeyin. Sistem bunları otomatik
@@ -540,7 +540,7 @@ export default function TalepDetay({ id }: { id: string }) {
 
                 <div
                   className="mb-4 flex items-center justify-between rounded-xl px-4 py-4"
-                  style={{ background: "rgba(200,163,74,.06)", border: "1px solid rgba(200,163,74,.22)" }}
+                  style={{ background: "var(--accent-wash)", border: "1px solid var(--accent-line)" }}
                 >
                   <div>
                     <div style={{ fontSize: 13, color: "var(--color-cream)", fontWeight: 500 }}>Harcanacak jeton</div>

@@ -22,7 +22,7 @@ export default function KilitliGorsel({
           style={{
             width: 38,
             height: 38,
-            background: "rgba(8,8,10,.6)",
+            background: "var(--locked-badge-bg)",
             border: "1px solid var(--color-line-strong)",
           }}
         >

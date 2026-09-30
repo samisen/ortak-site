@@ -66,8 +66,8 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
             style={{
               width: 44,
               height: 44,
-              background: "rgba(200,163,74,.09)",
-              border: "1px solid rgba(200,163,74,.24)",
+              background: "var(--accent-wash)",
+              border: "1px solid var(--accent-line)",
             }}
           >
             <LockFilled style={{ color: "var(--color-gold)", fontSize: 16 }} />
@@ -85,11 +85,11 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
             <div
               className="flex items-start gap-2.5 rounded-lg px-3.5 py-3"
               style={{
-                background: "rgba(196,112,63,.08)",
-                border: "1px solid rgba(196,112,63,.28)",
+                background: "var(--warn-wash)",
+                border: "1px solid var(--warn-line)",
               }}
             >
-              <WarningOutlined style={{ color: "#D98C5A", fontSize: 14, marginTop: 2 }} />
+              <WarningOutlined style={{ color: "var(--warn-fg)", fontSize: 14, marginTop: 2 }} />
               <span style={{ fontSize: 12.5, lineHeight: 1.6, color: "var(--color-muted)" }}>
                 Tarayici sifreleme API&apos;si kullanilamiyor. Siteyi{" "}
                 <strong style={{ color: "var(--color-cream)", fontWeight: 500 }}>https</strong> veya{" "}
@@ -114,7 +114,7 @@ export default function GateKapisi({ children }: { children: ReactNode }) {
 
               <div style={{ minHeight: 22, paddingTop: 8 }}>
                 {hata && (
-                  <span style={{ fontSize: 12.5, color: "#C0553F" }}>
+                  <span style={{ fontSize: 12.5, color: "var(--err-fg)" }}>
                     Sifre hatali. Tekrar deneyin.
                   </span>
                 )}

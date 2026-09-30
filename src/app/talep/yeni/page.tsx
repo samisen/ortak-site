@@ -252,7 +252,7 @@ export default function YeniTalep() {
                     className="mt-5"
                     type="info"
                     showIcon
-                    style={{ background: "rgba(200,163,74,.06)", border: "1px solid rgba(200,163,74,.2)" }}
+                    style={{ background: "var(--accent-wash)", border: "1px solid var(--accent-line)" }}
                     title={
                       <span style={{ fontSize: 12.5, color: "var(--color-muted)" }}>
                         Bölgeyi geniş tutmak size daha çok teklif getirir, dar tutmak daha isabetli teklif.
@@ -418,7 +418,7 @@ export default function YeniTalep() {
                 </p>
 
                 <div className="mb-3 flex items-start gap-3.5 rounded-xl px-4 py-4"
-                  style={{ background: "rgba(90,169,123,.06)", border: "1px solid rgba(90,169,123,.26)" }}>
+                  style={{ background: "var(--ok-wash)", border: "1px solid var(--ok-line)" }}>
                   <CheckCircleFilled style={{ color: "var(--color-verified)", fontSize: 16, marginTop: 2 }} />
                   <div className="flex-1">
                     <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-cream)" }}>Kimlik doğrulandı</div>
@@ -432,8 +432,8 @@ export default function YeniTalep() {
                 <div
                   className="mb-6 rounded-xl px-4 py-4"
                   style={{
-                    background: butceBelgesi ? "rgba(90,169,123,.06)" : "var(--color-surface-2)",
-                    border: `1px solid ${butceBelgesi ? "rgba(90,169,123,.26)" : "var(--color-line)"}`,
+                    background: butceBelgesi ? "var(--ok-wash)" : "var(--color-surface-2)",
+                    border: `1px solid ${butceBelgesi ? "var(--ok-line)" : "var(--color-line)"}`,
                   }}
                 >
                   <div className="flex items-start gap-3.5">
@@ -551,7 +551,7 @@ export default function YeniTalep() {
                 <Alert
                   type="success"
                   showIcon
-                  style={{ background: "rgba(90,169,123,.06)", border: "1px solid rgba(90,169,123,.26)" }}
+                  style={{ background: "var(--ok-wash)", border: "1px solid var(--ok-line)" }}
                   title={
                     <span style={{ fontSize: 12.5, color: "var(--color-muted)" }}>
                       Talebiniz yayınlandığında kriterlerinize uyan{" "}

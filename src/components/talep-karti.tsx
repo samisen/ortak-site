@@ -9,7 +9,7 @@ import { RozetListesi } from "./rozetler";
 import type { Talep } from "@/lib/types";
 
 const ACILIYET_RENK: Record<Talep["aciliyet"], { bg: string; bd: string; fg: string }> = {
-  acil:    { bg: "rgba(196,112,63,.12)", bd: "rgba(196,112,63,.32)", fg: "#D98C5A" },
+  acil:    { bg: "var(--warn-wash)", bd: "var(--warn-line)", fg: "var(--warn-fg)" },
   normal:  { bg: "var(--color-surface-3)", bd: "var(--color-line)", fg: "var(--color-muted)" },
   firsat:  { bg: "var(--color-surface-3)", bd: "var(--color-line)", fg: "var(--color-faint)" },
 };
@@ -25,8 +25,8 @@ export function UyumRozeti({ uyum }: { uyum: number }) {
         style={{
           fontSize: 11.5,
           color: renk,
-          background: iyi ? "rgba(200,163,74,.09)" : "var(--color-surface-3)",
-          border: `1px solid ${iyi ? "rgba(200,163,74,.24)" : "var(--color-line)"}`,
+          background: iyi ? "var(--accent-wash)" : "var(--color-surface-3)",
+          border: `1px solid ${iyi ? "var(--accent-line)" : "var(--color-line)"}`,
         }}
       >
         <span style={{ fontWeight: 600 }}>%{uyum}</span>

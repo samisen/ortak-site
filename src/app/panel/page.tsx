@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import { SATICI } from "@/lib/data";
 import { useDemo } from "@/lib/demo-store";
+import { useTema } from "@/lib/tema";
 import type { ColumnsType } from "antd/es/table";
 
 const PAKETLER = [
@@ -51,6 +52,7 @@ const DURUM: Record<TeklifDurum, { etiket: string; renk: string; ikon: React.Rea
 export default function Panel() {
   const { message } = App.useApp();
   const { jeton, yukle } = useDemo();
+  const { palet } = useTema();
   const [satinAlim, setSatinAlim] = useState<(typeof PAKETLER)[number] | null>(null);
 
   const harcanan = SATIRLAR.filter((s) => s.durum !== "iade").reduce((a, s) => a + s.jeton, 0);
@@ -128,7 +130,7 @@ export default function Panel() {
 
         <div
           className="flex items-center gap-5 rounded-xl px-5 py-4"
-          style={{ background: "rgba(200,163,74,.06)", border: "1px solid rgba(200,163,74,.24)" }}
+          style={{ background: "var(--accent-wash)", border: "1px solid var(--accent-line)" }}
         >
           <div>
             <div className="overline mb-1">Jeton bakiyeniz</div>
@@ -207,8 +209,8 @@ export default function Panel() {
                     percent={h.oran}
                     showInfo={false}
                     size={["100%", 6]}
-                    strokeColor="#C8A34A"
-                    railColor="#1E1E24"
+                    strokeColor={palet.gold}
+                    railColor={palet.surface3}
                   />
                 </div>
               ))}
@@ -255,8 +257,8 @@ export default function Panel() {
                   onClick={() => setSatinAlim(p)}
                   className="lift w-full cursor-pointer rounded-xl px-4 py-3.5 text-left"
                   style={{
-                    background: p.populer ? "rgba(200,163,74,.07)" : "var(--color-surface-2)",
-                    border: `1px solid ${p.populer ? "rgba(200,163,74,.28)" : "var(--color-line)"}`,
+                    background: p.populer ? "var(--accent-wash)" : "var(--color-surface-2)",
+                    border: `1px solid ${p.populer ? "var(--accent-line-2)" : "var(--color-line)"}`,
                   }}
                 >
                   <div className="flex items-baseline justify-between">
@@ -299,7 +301,7 @@ export default function Panel() {
           {/* Portföy uyarısı */}
           <div
             className="rounded-xl p-5"
-            style={{ background: "rgba(200,163,74,.05)", border: "1px solid rgba(200,163,74,.2)" }}
+            style={{ background: "var(--accent-wash)", border: "1px solid var(--accent-line)" }}
           >
             <div className="mb-1.5" style={{ fontSize: 13.5, fontWeight: 600, color: "var(--color-cream)" }}>
               Portföyünüzü tanımlayın

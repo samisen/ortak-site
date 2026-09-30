@@ -4,6 +4,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import Providers from "@/components/providers";
 import SiteHeader from "@/components/site-header";
 import GateKapisi from "@/components/gate-kapisi";
+import { TEMA_DEPO_ANAHTARI } from "@/lib/palet";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,9 +29,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/**
+ * Boyama oncesi calisir: kayitli tercihe (yoksa isletim sistemine) gore
+ * data-theme'i ayarlar. Olmazsa koyu tema secmis kullanici once beyaz
+ * bir flas gorur.
+ */
+const TEMA_SCRIPTI = `(function(){try{var k='${TEMA_DEPO_ANAHTARI}';var v=localStorage.getItem(k);var t=(v==='light'||v==='dark')?v:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" className={`${inter.variable} ${serif.variable}`}>
+    <html lang="tr" className={`${inter.variable} ${serif.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: TEMA_SCRIPTI }} />
+      </head>
       <body>
         <AntdRegistry>
           <Providers>

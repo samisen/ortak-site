@@ -58,8 +58,8 @@ export default function AnaSayfa() {
               <div
                 className="mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1.5"
                 style={{
-                  background: "rgba(200,163,74,.08)",
-                  border: "1px solid rgba(200,163,74,.22)",
+                  background: "var(--accent-wash)",
+                  border: "1px solid var(--accent-line)",
                   fontSize: 12,
                   color: "var(--color-gold-soft)",
                 }}
@@ -159,8 +159,8 @@ export default function AnaSayfa() {
                   style={{
                     width: 42,
                     height: 42,
-                    background: "rgba(200,163,74,.09)",
-                    border: "1px solid rgba(200,163,74,.22)",
+                    background: "var(--accent-wash)",
+                    border: "1px solid var(--accent-line)",
                     color: "var(--color-gold)",
                     fontSize: 17,
                   }}

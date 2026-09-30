@@ -4,6 +4,71 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @theme {
+  --font-display: var(--font-instrument), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ============================================================
+   RENK PALETİ
+   Tek kaynak burasıdır. antd'nin ihtiyaç duyduğu birkaç değer
+   src/lib/palet.ts içinde aynen tekrarlanır — biri değişirse
+   diğeri de değişmeli.
+   ============================================================ */
+
+/* --- Açık tema (varsayılan) --- */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-ink:          #FAF8F4;
+  --color-surface:      #FFFFFF;
+  --color-surface-2:    #F4F1EA;
+  --color-surface-3:    #EAE5DA;
+  --color-line:         #E4DFD3;
+  --color-line-strong:  #CCC5B4;
+
+  --color-cream:        #1B1A17;
+  --color-muted:        #5E5B54;
+  --color-faint:        #8B877E;
+
+  --color-gold:         #9A7A22;
+  --color-gold-soft:    #6E5514;
+  --color-gold-dim:     #E6DCC0;
+
+  --color-verified:     #2F7A52;
+  --color-alert:        #A6511F;
+
+  --accent-wash:        rgba(154,122,34,.07);
+  --accent-wash-2:      rgba(154,122,34,.14);
+  --accent-line:        rgba(154,122,34,.26);
+  --accent-line-2:      rgba(154,122,34,.42);
+  --accent-glow:        rgba(154,122,34,.10);
+  --accent-shimmer:     rgba(154,122,34,.13);
+
+  --ok-wash:            rgba(47,122,82,.08);
+  --ok-wash-2:          rgba(47,122,82,.14);
+  --ok-line:            rgba(47,122,82,.30);
+
+  --warn-wash:          rgba(166,81,31,.08);
+  --warn-line:          rgba(166,81,31,.30);
+  --warn-fg:            #A6511F;
+  --err-fg:             #A8402C;
+
+  --header-bg:          rgba(250,248,244,.86);
+  --grid-line:          rgba(0,0,0,.038);
+  --shadow-panel:       0 1px 2px rgba(27,26,23,.04), 0 8px 24px -12px rgba(27,26,23,.10);
+
+  --locked-1:           #EFEBE1;
+  --locked-2:           #E0DACB;
+  --locked-3:           #F3F0E8;
+  --locked-stripe:      rgba(27,26,23,.05);
+  --locked-badge-bg:    rgba(255,255,255,.72);
+}
+
+/* --- Koyu tema --- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
   --color-ink:          #08080A;
   --color-surface:      #101013;
   --color-surface-2:    #17171B;
@@ -22,11 +87,39 @@
   --color-verified:     #5AA97B;
   --color-alert:        #C4703F;
 
-  --font-display: var(--font-instrument), "Iowan Old Style", Georgia, serif;
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --accent-wash:        rgba(200,163,74,.08);
+  --accent-wash-2:      rgba(200,163,74,.13);
+  --accent-line:        rgba(200,163,74,.22);
+  --accent-line-2:      rgba(200,163,74,.32);
+  --accent-glow:        rgba(200,163,74,.10);
+  --accent-shimmer:     rgba(200,163,74,.14);
+
+  --ok-wash:            rgba(90,169,123,.07);
+  --ok-wash-2:          rgba(90,169,123,.11);
+  --ok-line:            rgba(90,169,123,.28);
+
+  --warn-wash:          rgba(196,112,63,.09);
+  --warn-line:          rgba(196,112,63,.29);
+  --warn-fg:            #D98C5A;
+  --err-fg:             #C0553F;
+
+  --header-bg:          rgba(8,8,10,.82);
+  --grid-line:          rgba(255,255,255,.022);
+  --shadow-panel:       none;
+
+  --locked-1:           #262630;
+  --locked-2:           #14141A;
+  --locked-3:           #2C2C38;
+  --locked-stripe:      rgba(255,255,255,.04);
+  --locked-badge-bg:    rgba(8,8,10,.6);
 }
 
-html { color-scheme: dark; }
+/* ============================================================
+   TEMEL
+   ============================================================ */
+
+html { background: var(--color-ink); }
+
 body {
   margin: 0;
   background: var(--color-ink);
@@ -35,7 +128,13 @@ body {
   -webkit-font-smoothing: antialiased;
   font-feature-settings: "cv02","cv03","cv04";
 }
-::selection { background: var(--color-gold-dim); color: var(--color-cream); }
+
+::selection { background: var(--accent-wash-2); color: var(--color-cream); }
+
+/* Tema geçişini yumuşat — ama kullanıcı hareketi azaltmayı seçtiyse hayır */
+@media (prefers-reduced-motion: no-preference) {
+  body, .panel, .panel-2 { transition: background-color .22s ease, border-color .22s ease, color .22s ease; }
+}
 
 /* --- Tipografi --- */
 .display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.015em; line-height: 1.05; }
@@ -43,24 +142,29 @@ body {
 .num { font-variant-numeric: tabular-nums; }
 
 /* --- Yüzeyler --- */
-.panel { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 14px; }
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-panel);
+}
 .panel-2 { background: var(--color-surface-2); border: 1px solid var(--color-line); border-radius: 12px; }
-.lift { transition: border-color .18s ease, background .18s ease, transform .18s ease; }
-.lift:hover { border-color: var(--color-line-strong); background: var(--color-surface-2); transform: translateY(-1px); }
+.lift { transition: border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease; }
+.lift:hover { border-color: var(--color-line-strong); transform: translateY(-1px); }
 
-/* Sayfa üstü altın ışıma */
+/* Sayfa üstü vurgu ışıması */
 .glow { position: relative; }
 .glow::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background: radial-gradient(1000px 460px at 50% -8%, rgba(200,163,74,.09), transparent 68%);
+  background: radial-gradient(1000px 460px at 50% -8%, var(--accent-glow), transparent 68%);
 }
 
 /* İnce ızgara dokusu */
 .grid-tex::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
   background-image:
-    linear-gradient(to right, rgba(255,255,255,.022) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,.022) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(760px 420px at 50% 0%, #000 20%, transparent 78%);
 }
@@ -68,14 +172,14 @@ body {
 /* --- Kilitli görsel --- */
 .locked-media {
   position: relative; overflow: hidden;
-  background: linear-gradient(135deg, #262630 0%, #14141A 48%, #2C2C38 100%);
+  background: linear-gradient(135deg, var(--locked-1) 0%, var(--locked-2) 48%, var(--locked-3) 100%);
 }
 .locked-media::after {
   content: ""; position: absolute; inset: -25%;
-  background: repeating-linear-gradient(115deg, rgba(255,255,255,.04) 0 12px, transparent 12px 32px);
+  background: repeating-linear-gradient(115deg, var(--locked-stripe) 0 12px, transparent 12px 32px);
 }
 
-.shimmer { background: linear-gradient(90deg, transparent, rgba(200,163,74,.14), transparent); background-size: 200% 100%; animation: shim 3s ease-in-out infinite; }
+.shimmer { background: linear-gradient(90deg, transparent, var(--accent-shimmer), transparent); background-size: 200% 100%; animation: shim 3s ease-in-out infinite; }
 @keyframes shim { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
 .pulse-dot { animation: pd 2s ease-in-out infinite; }
@@ -84,13 +188,12 @@ body {
 /* --- Scrollbar --- */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--color-ink); }
-::-webkit-scrollbar-thumb { background: var(--color-surface-3); border-radius: 6px; border: 2px solid var(--color-ink); }
-::-webkit-scrollbar-thumb:hover { background: var(--color-line-strong); }
+::-webkit-scrollbar-thumb { background: var(--color-line-strong); border-radius: 6px; border: 2px solid var(--color-ink); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-faint); }
 
 /* --- antd ince ayarlar --- */
 .ant-tag { font-variant-numeric: tabular-nums; }
 .ant-steps .ant-steps-item-title { font-size: 13px !important; }
-.ant-segmented { font-feature-settings: "cv02"; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }

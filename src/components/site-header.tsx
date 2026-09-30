@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button, Segmented, Tooltip, Badge } from "antd";
-import { PlusOutlined, ThunderboltFilled } from "@ant-design/icons";
+import { PlusOutlined, ThunderboltFilled, SunOutlined, MoonFilled } from "@ant-design/icons";
 import { ALICI } from "@/lib/data";
 import { useDemo } from "@/lib/demo-store";
+import { useTema } from "@/lib/tema";
 
 type Persona = "alici" | "satici";
 
@@ -33,12 +34,13 @@ export default function SiteHeader() {
   const router = useRouter();
   const persona = personaBul(yol);
   const { jeton } = useDemo();
+  const { tema, ayarla } = useTema();
 
   return (
     <header
       className="sticky top-0 z-50"
       style={{
-        background: "rgba(8,8,10,.82)",
+        background: "var(--header-bg)",
         backdropFilter: "blur(14px)",
         borderBottom: "1px solid var(--color-line)",
       }}
@@ -69,6 +71,22 @@ export default function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-3">
+          <Tooltip title={tema === "dark" ? "Açık temaya geç" : "Koyu temaya geç"}>
+            <Button
+              type="text"
+              shape="circle"
+              aria-label={tema === "dark" ? "Açık temaya geç" : "Koyu temaya geç"}
+              onClick={() => ayarla(tema === "dark" ? "light" : "dark")}
+              icon={
+                tema === "dark" ? (
+                  <SunOutlined style={{ fontSize: 15 }} />
+                ) : (
+                  <MoonFilled style={{ fontSize: 14 }} />
+                )
+              }
+            />
+          </Tooltip>
+
           <Tooltip title="Demo için taraf değiştirin — ürün iki farklı deneyim sunuyor">
             <Segmented
               size="small"

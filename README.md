@@ -14,6 +14,27 @@ npm install
 npm run dev        # http://localhost:8888
 ```
 
+## Tema (açık / koyu)
+
+Site hem açık hem koyu temayı destekler. Varsayılan, ziyaretçinin işletim
+sistemi tercihidir; header'daki anahtarla değiştirilir ve seçim
+`localStorage`'da saklanır.
+
+- **Tek renk kaynağı `src/app/globals.css`.** Tüm renkler CSS değişkeni olarak
+  `:root[data-theme="light"]` ve `:root[data-theme="dark"]` altında tanımlı.
+  Bileşenlerde sabit kodlanmış renk yoktur.
+- **`src/lib/palet.ts`** yalnızca antd'nin ihtiyaç duyduğu değerleri tekrar eder.
+  antd `ConfigProvider` gerçek renk değeri ister, CSS değişkeni kabul etmez
+  (SSR'da çözülemediği için hidrasyon uyuşmazlığı çıkarır). Bu iki dosya
+  birbiriyle senkron kalmalı.
+- **`layout.tsx` içindeki satır içi script** boyama öncesi `data-theme`'i ayarlar.
+  Olmazsa koyu tema seçmiş kullanıcı önce beyaz bir flaş görür.
+- antd tarafı `theme.defaultAlgorithm` / `theme.darkAlgorithm` arasında geçer.
+
+Yeni bir renk gerekirse: önce `globals.css`'e iki tema için de değişken ekleyin,
+sonra bileşende `var(--...)` ile kullanın. Doğrudan hex yazmayın — biri mutlaka
+diğer temada kırılır.
+
 ## Erişim kapısı (şifre duvarı)
 
 Site kapalı erişimde. Şifre **hiçbir yerde saklanmıyor**: build sırasında şifreden

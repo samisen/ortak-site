@@ -10,6 +10,7 @@ import {
 import KilitliGorsel from "@/components/kilitli-gorsel";
 import { TALEPLER, talepTeklifleri } from "@/lib/data";
 import { para, butceAralik, gecenSure } from "@/lib/format";
+import { useTema } from "@/lib/tema";
 import type { Teklif, Talep } from "@/lib/types";
 
 /** Alıcının kendi açık talepleri */
@@ -138,7 +139,7 @@ export default function GelenKutusu() {
               className="mb-5"
               type="success"
               showIcon
-              style={{ background: "rgba(90,169,123,.07)", border: "1px solid rgba(90,169,123,.26)" }}
+              style={{ background: "var(--ok-wash)", border: "1px solid var(--ok-line)" }}
               title={
                 <span style={{ fontSize: 12.5, color: "var(--color-muted)" }}>
                   Karşı tarafa da sizin iletişim bilginiz iletildi. Bundan sonrası ikinizin arasında —
@@ -172,7 +173,7 @@ export default function GelenKutusu() {
               <a
                 href="tel:+900000000000"
                 className="flex items-center justify-center gap-2 rounded-lg py-3 no-underline"
-                style={{ background: "rgba(200,163,74,.1)", border: "1px solid rgba(200,163,74,.3)", color: "var(--color-gold-soft)", fontSize: 15, fontWeight: 600 }}
+                style={{ background: "var(--accent-wash-2)", border: "1px solid var(--accent-line-2)", color: "var(--color-gold-soft)", fontSize: 15, fontWeight: 600 }}
               >
                 <PhoneFilled style={{ fontSize: 13 }} />
                 <span className="num">{acilan.saticiTelefon ?? "+90 532 411 08 26"}</span>
@@ -209,13 +210,14 @@ function TeklifKarti({
   teklif: Teklif; talep: Talep; durum: Durum; favori: boolean;
   onFavori: () => void; onAc: () => void; onReddet: () => void;
 }) {
+  const { palet } = useTema();
   const acildi = durum === "acildi";
   const butceIci = t.fiyat >= talep.butceMin && t.fiyat <= talep.butceMax;
 
   return (
     <article
       className="panel overflow-hidden"
-      style={{ borderColor: acildi ? "rgba(90,169,123,.3)" : undefined }}
+      style={{ borderColor: acildi ? "var(--ok-line)" : undefined }}
     >
       <div className="grid gap-5 p-5 md:grid-cols-[210px_1fr]">
         {/* Görsel */}
@@ -223,7 +225,7 @@ function TeklifKarti({
           {acildi ? (
             <div
               className="flex flex-col items-center justify-center gap-2 rounded-xl"
-              style={{ height: 180, background: "var(--color-surface-2)", border: "1px solid rgba(90,169,123,.28)" }}
+              style={{ height: 180, background: "var(--color-surface-2)", border: "1px solid var(--ok-line)" }}
             >
               <PictureOutlined style={{ fontSize: 20, color: "var(--color-verified)" }} />
               <span className="num" style={{ fontSize: 12, color: "var(--color-muted)" }}>
@@ -240,7 +242,7 @@ function TeklifKarti({
                 %{t.uyum}
               </span>
             </div>
-            <Progress percent={t.uyum} showInfo={false} size="small" strokeColor="#C8A34A" railColor="#1E1E24" />
+            <Progress percent={t.uyum} showInfo={false} size="small" strokeColor={palet.gold} railColor={palet.surface3} />
           </div>
         </div>
 
@@ -273,9 +275,9 @@ function TeklifKarti({
                 className="rounded px-2 py-0.5"
                 style={{
                   fontSize: 11,
-                  background: butceIci ? "rgba(90,169,123,.1)" : "rgba(196,112,63,.1)",
-                  border: `1px solid ${butceIci ? "rgba(90,169,123,.3)" : "rgba(196,112,63,.3)"}`,
-                  color: butceIci ? "var(--color-verified)" : "#D98C5A",
+                  background: butceIci ? "var(--ok-wash-2)" : "var(--warn-wash)",
+                  border: `1px solid ${butceIci ? "var(--ok-line)" : "var(--warn-line)"}`,
+                  color: butceIci ? "var(--color-verified)" : "var(--warn-fg)",
                 }}
               >
                 {butceIci ? "bütçe içinde" : "bütçe dışında"}
@@ -310,7 +312,7 @@ function TeklifKarti({
             {acildi ? (
               <span
                 className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2"
-                style={{ fontSize: 13, background: "rgba(90,169,123,.08)", border: "1px solid rgba(90,169,123,.28)", color: "var(--color-verified)" }}
+                style={{ fontSize: 13, background: "var(--ok-wash)", border: "1px solid var(--ok-line)", color: "var(--color-verified)" }}
               >
                 <CheckCircleFilled style={{ fontSize: 12 }} /> İletişim açıldı
               </span>

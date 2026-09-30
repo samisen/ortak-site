@@ -35,8 +35,8 @@ export function Rozet({ kod, kucuk = false }: { kod: RozetKod; kucuk?: boolean }
           fontSize: kucuk ? 11 : 12,
           padding: kucuk ? "2px 7px" : "3px 9px",
           color: vurgu ? "var(--color-gold-soft)" : "var(--color-muted)",
-          background: vurgu ? "rgba(200,163,74,.09)" : "var(--color-surface-3)",
-          border: `1px solid ${vurgu ? "rgba(200,163,74,.24)" : "var(--color-line)"}`,
+          background: vurgu ? "var(--accent-wash)" : "var(--color-surface-3)",
+          border: `1px solid ${vurgu ? "var(--accent-line)" : "var(--color-line)"}`,
         }}
       >
         <span style={{ fontSize: kucuk ? 10 : 11, opacity: 0.9 }}>{IKON[kod]}</span>

@@ -189,7 +189,7 @@ export default function TaleplerSayfasi() {
           {/* Kayıtlı arama kutusu */}
           <div
             className="mt-4 rounded-xl p-5"
-            style={{ background: "rgba(200,163,74,.05)", border: "1px solid rgba(200,163,74,.2)" }}
+            style={{ background: "var(--accent-wash)", border: "1px solid var(--accent-line)" }}
           >
             <BellOutlined style={{ color: "var(--color-gold)", fontSize: 15 }} />
             <div className="mb-1.5 mt-2.5" style={{ fontSize: 13.5, fontWeight: 600, color: "var(--color-cream)" }}>
