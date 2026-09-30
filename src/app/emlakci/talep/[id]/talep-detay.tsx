@@ -5,6 +5,7 @@ import Link from "next/link";
 import { App, Button, Input, Tag, Tooltip } from "antd";
 import { ArrowLeftOutlined, CheckCircleFilled, EnvironmentOutlined, InfoCircleOutlined, ThunderboltFilled } from "@ant-design/icons";
 import { useDemo } from "@/lib/demo-store";
+import { KAP } from "@/components/kap";
 import { DEMO_EMLAKCI, PORTFOYUM } from "@/lib/data";
 import { ERKEN_ERISIM_ORANI, ERKEN_ERISIM_SAAT, KOLTUK, baglantiUcreti, karsilastir } from "@/lib/eslesme";
 import { butceAralik, gecenSaat, gecenSure, kalanGun, tl } from "@/lib/format";
@@ -51,7 +52,7 @@ export default function TalepDetay({ id }: { id: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-[1200px] px-5 py-8">
+    <div className={`${KAP} py-10`}>
       <Link href="/emlakci" className="mb-6 inline-flex items-center gap-2 no-underline" style={{ fontSize: 13, color: "var(--color-muted)" }}>
         <ArrowLeftOutlined style={{ fontSize: 11 }} /> Talepler
       </Link>

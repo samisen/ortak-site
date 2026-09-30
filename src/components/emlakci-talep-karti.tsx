@@ -25,8 +25,11 @@ export default function EmlakciTalepKarti({
   const erken = gecenSaat(t.yayin) < ERKEN_ERISIM_SAAT;
 
   return (
-    <Link href={`/emlakci/talep/${t.id}`} className="block h-full no-underline">
-      <article className="panel lift flex h-full flex-col p-5" style={{ color: "inherit", opacity: dolu ? 0.6 : 1 }}>
+    // Yüzde yükseklik kullanılmıyor: grid öğesi satır boyunca kendiliğinden uzar,
+    // kart da flex-1 ile onu doldurur. (h-full iç içe kullanılınca satır yüksekliği
+    // yanlış hesaplanıp kartlar alttaki satırın üstüne taşıyordu.)
+    <Link href={`/emlakci/talep/${t.id}`} className="flex no-underline">
+      <article className="panel lift flex flex-1 flex-col p-5" style={{ color: "inherit", opacity: dolu ? 0.6 : 1 }}>
         {/* Üst satır */}
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <span className="overline" style={{ color: "var(--color-gold)", letterSpacing: ".14em" }}>

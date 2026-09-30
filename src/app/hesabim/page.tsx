@@ -2,16 +2,18 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Button, Segmented, Tabs } from "antd";
+import { Button, Tabs } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { DEMO_ALICI, talepTeklifleri } from "@/lib/data";
 import { useDemo } from "@/lib/demo-store";
 import { butceAralik, kalanGun, tlKisa } from "@/lib/format";
+import { konumMetni } from "@/lib/kriterler";
 import { KOLTUK } from "@/lib/eslesme";
 import { BOLGELER, talepBolgesi } from "@/lib/bolgeler";
 import type { Talep } from "@/lib/types";
 import { DogrulamaEtiketi, KriterCipleri, Koltuklar } from "@/components/ui";
 import TeklifKarti from "@/components/teklif-karti";
+import Kap from "@/components/kap";
 
 /** Piyasa Nabzı: bir bölgede bundan az talep varsa rakamlar gösterilmez */
 const ESIK = 5;
@@ -66,12 +68,55 @@ function PiyasaNabzi({ talepler }: { talepler: Talep[] }) {
   );
 }
 
+/** Sol sütundaki talep kartı: seçili olan açık, diğerleri özet halinde */
+function TalepKutusu({ talep: t, secili, teklifSayisi, koltuk, onSec }: { talep: Talep; secili: boolean; teklifSayisi: number; koltuk: number; onSec: () => void }) {
+  if (!secili) {
+    return (
+      <button
+        type="button"
+        onClick={onSec}
+        className="panel lift w-full cursor-pointer p-4 text-left"
+        style={{ color: "inherit" }}
+      >
+        <div className="mb-1 flex items-baseline justify-between gap-2">
+          <span className="num" style={{ fontSize: 15, fontWeight: 600, color: "var(--color-gold-soft)" }}>{butceAralik(t.butceMin, t.butceMax)}</span>
+          <span className="num" style={{ fontSize: 11.5, color: "var(--color-faint)" }}>{t.id}</span>
+        </div>
+        <div style={{ fontSize: 13, color: "var(--color-muted)" }}>
+          {t.kriterler.turler.join(" / ")} · {konumMetni(t.kriterler.semtler)}
+        </div>
+        <div className="mt-2" style={{ fontSize: 12, color: "var(--color-faint)" }}>
+          {teklifSayisi ? `${teklifSayisi} teklif` : "Teklif bekleniyor"}
+        </div>
+      </button>
+    );
+  }
+
+  return (
+    <section className="panel p-5" style={{ borderColor: "var(--accent-line)" }}>
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <span className="num display" style={{ fontSize: 26, color: "var(--color-gold-soft)" }}>{butceAralik(t.butceMin, t.butceMax)}</span>
+        <span className="num" style={{ fontSize: 11.5, color: "var(--color-faint)" }}>{t.id}</span>
+      </div>
+      <div className="mb-3" style={{ fontSize: 12.5, color: "var(--color-faint)" }}>
+        {t.pesin ? "Peşin · " : ""}{kalanGun(t.bitis)} gün açık
+      </div>
+      <p style={{ fontSize: 14, lineHeight: 1.6, color: "var(--color-cream)", margin: "0 0 14px" }}>“{t.cumle}”</p>
+      <div className="mb-4"><KriterCipleri kriterler={t.kriterler} esnek={t.esnek} kucuk /></div>
+      <div className="flex flex-col gap-2 pt-4" style={{ borderTop: "1px solid var(--color-line)" }}>
+        <Koltuklar dolu={koltuk} />
+        <DogrulamaEtiketi tur={t.dogrulama} />
+      </div>
+    </section>
+  );
+}
+
 export default function Hesabim() {
-  const { tumTalepler, yeniTalepler, kararlar, kararVer, koltukDolu } = useDemo();
+  const { tumTalepler, yeniTalepler, aliciTalepIdleri, kararlar, kararVer, koltukDolu } = useDemo();
 
   const benim = useMemo(
-    () => [...yeniTalepler.filter((t) => t.acan === "alici"), ...tumTalepler.filter((t) => t.id === DEMO_ALICI.talepId)],
-    [yeniTalepler, tumTalepler]
+    () => [...yeniTalepler.filter((t) => aliciTalepIdleri.includes(t.id)), ...tumTalepler.filter((t) => t.id === DEMO_ALICI.talepId)],
+    [yeniTalepler, aliciTalepIdleri, tumTalepler]
   );
   const [secili, setSecili] = useState<string>();
   const talep = benim.find((t) => t.id === secili) ?? benim[0];
@@ -80,73 +125,66 @@ export default function Hesabim() {
   const bekleyen = teklifler.filter((t) => !kararlar[t.id] || kararlar[t.id] === "farki-gordu").length;
 
   return (
-    <div className="mx-auto max-w-[920px] px-5 py-10">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <Kap className="py-10">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <h1 className="display" style={{ fontSize: "clamp(30px,4.5vw,40px)", margin: 0 }}>Talepleriniz</h1>
         <Link href="/"><Button icon={<PlusOutlined />}>Yeni talep</Button></Link>
       </div>
 
-      {benim.length > 1 && (
-        <Segmented
-          className="mb-5"
-          value={talep.id}
-          onChange={(v) => setSecili(v as string)}
-          options={benim.map((t) => ({ value: t.id, label: `${t.id} · ${t.kriterler.turler[0] ?? "Talep"}` }))}
-        />
-      )}
+      <div className="grid items-start gap-8 lg:grid-cols-[340px_minmax(0,1fr)]">
+        <aside className="flex flex-col gap-3 lg:sticky lg:top-24">
+          {benim.map((t) => (
+            <TalepKutusu
+              key={t.id}
+              talep={t}
+              secili={t.id === talep.id}
+              teklifSayisi={talepTeklifleri(t.id).length}
+              koltuk={koltukDolu(t.id)}
+              onSec={() => setSecili(t.id)}
+            />
+          ))}
+        </aside>
 
-      {/* Talebin kendisi */}
-      <section className="panel mb-8 p-6">
-        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
-          <span className="num display" style={{ fontSize: 26, color: "var(--color-gold-soft)" }}>
-            {butceAralik(talep.butceMin, talep.butceMax)}{talep.pesin && <span style={{ fontSize: 15, color: "var(--color-muted)", fontFamily: "var(--font-sans)" }}> · peşin</span>}
-          </span>
-          <span className="num" style={{ fontSize: 12, color: "var(--color-faint)" }}>{talep.id} · {kalanGun(talep.bitis)} gün açık</span>
+        <div className="min-w-0">
+          <Tabs
+            style={{ marginTop: -8 }}
+            items={[
+              {
+                key: "teklifler",
+                label: `Teklifler${teklifler.length ? ` (${teklifler.length})` : ""}`,
+                children: teklifler.length ? (
+                  <div className="flex flex-col gap-4">
+                    {bekleyen > 0 && (
+                      <p style={{ fontSize: 13.5, color: "var(--color-muted)", margin: "0 0 4px" }}>
+                        {bekleyen} teklif kararınızı bekliyor. İlgilenmediğiniz tekliflerde emlakçıya ücret yansımaz.
+                      </p>
+                    )}
+                    {teklifler.map((tk) => (
+                      <TeklifKarti
+                        key={tk.id}
+                        teklif={tk}
+                        talep={talep}
+                        karar={kararlar[tk.id]}
+                        onKarar={(k, s) => kararVer(tk.id, k, s)}
+                        filigran={DEMO_ALICI.kod}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="panel-2 px-6 py-14 text-center">
+                    <div style={{ fontSize: 15, color: "var(--color-cream)", marginBottom: 6 }}>Teklif bekleniyor</div>
+                    <div style={{ fontSize: 13, lineHeight: 1.6, color: "var(--color-muted)" }}>
+                      Talebiniz bölgedeki emlakçılara iletildi. {KOLTUK} koltuğun tamamı boş;
+                      teklifler geldikçe burada görünecek.
+                    </div>
+                  </div>
+                ),
+              },
+              { key: "piyasa", label: "Piyasa Nabzı", children: <PiyasaNabzi talepler={tumTalepler} /> },
+            ]}
+          />
         </div>
-        <p style={{ fontSize: 14.5, lineHeight: 1.6, color: "var(--color-cream)", margin: "0 0 14px" }}>“{talep.cumle}”</p>
-        <div className="mb-4"><KriterCipleri kriterler={talep.kriterler} esnek={talep.esnek} /></div>
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-4" style={{ borderTop: "1px solid var(--color-line)" }}>
-          <Koltuklar dolu={koltukDolu(talep.id)} />
-          <DogrulamaEtiketi tur={talep.dogrulama} />
-        </div>
-      </section>
-
-      <Tabs
-        items={[
-          {
-            key: "teklifler",
-            label: `Teklifler${teklifler.length ? ` (${teklifler.length})` : ""}`,
-            children: teklifler.length ? (
-              <div className="flex flex-col gap-4">
-                {bekleyen > 0 && (
-                  <p style={{ fontSize: 13.5, color: "var(--color-muted)", margin: "4px 0 4px" }}>
-                    {bekleyen} teklif kararınızı bekliyor. İlgilenmediğiniz tekliflerde emlakçıya ücret yansımaz.
-                  </p>
-                )}
-                {teklifler.map((tk) => (
-                  <TeklifKarti
-                    key={tk.id}
-                    teklif={tk}
-                    talep={talep}
-                    karar={kararlar[tk.id]}
-                    onKarar={(k, s) => kararVer(tk.id, k, s)}
-                    filigran={DEMO_ALICI.kod}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="panel-2 px-6 py-12 text-center">
-                <div style={{ fontSize: 15, color: "var(--color-cream)", marginBottom: 6 }}>Teklif bekleniyor</div>
-                <div style={{ fontSize: 13, lineHeight: 1.6, color: "var(--color-muted)" }}>
-                  Talebiniz bölgedeki emlakçılara iletildi. {KOLTUK} koltuğun tamamı boş;
-                  teklifler geldikçe burada görünecek.
-                </div>
-              </div>
-            ),
-          },
-          { key: "piyasa", label: "Piyasa Nabzı", children: <PiyasaNabzi talepler={tumTalepler} /> },
-        ]}
-      />
-    </div>
+      </div>
+    </Kap>
   );
 }

@@ -6,6 +6,7 @@ import { Button, Table, Tabs, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PlusOutlined } from "@ant-design/icons";
 import { useDemo } from "@/lib/demo-store";
+import { KAP } from "@/components/kap";
 import { DEMO_EMLAKCI, GECMIS_TEKLIFLERIM, MUSTERI_TALEPLERIM, PORTFOYUM, talepTeklifleri } from "@/lib/data";
 import { baglantiUcreti, KOLTUK, portfoyUyumu } from "@/lib/eslesme";
 import { butceAralik, kalanGun, metre, tl } from "@/lib/format";
@@ -31,7 +32,7 @@ const DURUM: Record<Durum, { etiket: string; renk?: string }> = {
 };
 
 export default function Panel() {
-  const { gonderilenler, tumTalepler, yeniTalepler, kararlar, kararVer, koltukDolu } = useDemo();
+  const { gonderilenler, tumTalepler, yeniTalepler, musteriTalepIdleri, kararlar, kararVer, koltukDolu } = useDemo();
 
   const satirlar: Satir[] = useMemo(() => {
     const yeni: Satir[] = gonderilenler.map((g, i) => {
@@ -59,13 +60,13 @@ export default function Panel() {
   const baglanti = satirlar.filter((s) => s.durum === "baglandi").length;
   const karar = satirlar.filter((s) => s.durum !== "bekliyor").length;
   const musteriTalepleri = [
-    ...yeniTalepler.filter((t) => t.acan === "emlakci"),
+    ...yeniTalepler.filter((t) => musteriTalepIdleri.includes(t.id)),
     ...tumTalepler.filter((t) => MUSTERI_TALEPLERIM.includes(t.id)),
   ];
 
   const kolonlar: ColumnsType<Satir> = [
     {
-      title: "Talep", dataIndex: "talepId", width: 96,
+      title: "Talep", dataIndex: "talepId", width: 88,
       // Kapanmış taleplerin sayfası yok; yalnızca açık olanlara bağlantı ver
       render: (v: string) =>
         tumTalepler.some((t) => t.id === v) ? (
@@ -76,18 +77,18 @@ export default function Panel() {
     },
     { title: "Sunduğunuz mülk", dataIndex: "mulk" },
     {
-      title: "Tür", dataIndex: "tip", width: 96,
+      title: "Tür", dataIndex: "tip", width: 84,
       render: (v: Satir["tip"]) => <Tag style={{ margin: 0, borderStyle: v === "esnek" ? "dashed" : "solid" }}>{v === "esnek" ? "Esnek" : "Tam"}</Tag>,
     },
     {
-      title: "Durum", dataIndex: "durum", width: 150,
+      title: "Durum", dataIndex: "durum", width: 140,
       render: (v: Durum) => <Tag color={DURUM[v].renk} style={{ margin: 0 }}>{DURUM[v].etiket}</Tag>,
     },
-    { title: "Ücret", dataIndex: "ucret", width: 200, render: (v: string) => <span className="num" style={{ fontSize: 12.5, color: "var(--color-muted)" }}>{v}</span> },
+    { title: "Ücret", dataIndex: "ucret", width: 180, render: (v: string) => <span className="num" style={{ fontSize: 12.5, color: "var(--color-muted)" }}>{v}</span> },
   ];
 
   return (
-    <div className="mx-auto max-w-[1200px] px-5 py-10">
+    <div className={`${KAP} py-10`}>
       <div className="mb-8">
         <h1 className="display" style={{ fontSize: "clamp(30px,4vw,40px)", margin: "0 0 8px" }}>{DEMO_EMLAKCI.kurum}</h1>
         <p style={{ fontSize: 14, color: "var(--color-muted)", margin: 0 }}>
@@ -117,7 +118,7 @@ export default function Panel() {
             label: "Tekliflerim",
             children: (
               <div className="panel overflow-hidden">
-                <Table columns={kolonlar} dataSource={satirlar} pagination={false} scroll={{ x: 720 }} />
+                <Table columns={kolonlar} dataSource={satirlar} pagination={false} scroll={{ x: 660 }} />
               </div>
             ),
           },

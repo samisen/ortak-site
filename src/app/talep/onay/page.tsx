@@ -8,6 +8,28 @@ import { ArrowLeftOutlined, BankOutlined, CheckCircleFilled, TeamOutlined, Uploa
 import { ayristir, eksikler, type TaslakTalep } from "@/lib/ayristir";
 import { useDemo } from "@/lib/demo-store";
 import TalepDuzenleyici from "@/components/talep-duzenleyici";
+import Kap from "@/components/kap";
+import YanBilgi from "@/components/yan-bilgi";
+
+type Yol = "banka" | "emlakci";
+
+function YolSecenegi({ deger, secili, ikon, baslik, children }: { deger: Yol; secili: Yol; ikon: React.ReactNode; baslik: string; children: React.ReactNode }) {
+  const aktif = deger === secili;
+  return (
+    <label
+      className="flex cursor-pointer items-start gap-3 rounded-xl px-4 py-3.5"
+      style={{ background: aktif ? "var(--accent-wash)" : "var(--color-surface-2)", border: `1px solid ${aktif ? "var(--accent-line)" : "var(--color-line)"}` }}
+    >
+      <Radio value={deger} style={{ marginTop: 2 }} />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2" style={{ fontSize: 14, fontWeight: 500, color: "var(--color-cream)" }}>
+          <span style={{ color: "var(--color-gold)" }}>{ikon}</span> {baslik}
+        </div>
+        {children}
+      </div>
+    </label>
+  );
+}
 
 function Onay() {
   const q = useSearchParams().get("q") ?? "";
@@ -17,101 +39,101 @@ function Onay() {
 
   const ilk = useMemo(() => ayristir(q), [q]);
   const [taslak, setTaslak] = useState<TaslakTalep>(ilk);
-  const [yol, setYol] = useState<"banka" | "emlakci">("banka");
+  const [yol, setYol] = useState<Yol>("banka");
   const [belge, setBelge] = useState(false);
 
   const eksik = eksikler(taslak);
   const hazir = eksik.length === 0 && (yol === "emlakci" || belge);
+  const durumMetni = eksik.length
+    ? `Eksik: ${eksik.join(", ")}`
+    : yol === "banka" && !belge
+      ? "Devam etmek için belgeyi yükleyin"
+      : "Talebiniz 90 gün açık kalır";
 
   function ilet() {
-    talepAc(taslak, "alici", yol === "banka" ? "banka" : "kefil");
+    talepAc(taslak, "alici", yol === "emlakci");
     message.success(yol === "banka" ? "Talebiniz bölgedeki emlakçılara iletildi" : "Talebiniz iletildi; emlakçınız bütçenize kefil olacak");
     router.push("/hesabim");
   }
 
   if (!q) {
     return (
-      <div className="py-24 text-center" style={{ color: "var(--color-muted)" }}>
-        Önce ne aradığınızı yazın. <Link href="/" style={{ color: "var(--color-gold)" }}>Başa dön</Link>
-      </div>
+      <Kap className="py-24 text-center">
+        <span style={{ color: "var(--color-muted)" }}>
+          Önce ne aradığınızı yazın. <Link href="/" style={{ color: "var(--color-gold)" }}>Başa dön</Link>
+        </span>
+      </Kap>
     );
   }
 
   return (
-    <div className="mx-auto max-w-[720px] px-5 py-10">
+    <Kap className="py-10">
       <Link href="/" className="mb-8 inline-flex items-center gap-2 no-underline" style={{ fontSize: 13, color: "var(--color-muted)" }}>
         <ArrowLeftOutlined style={{ fontSize: 11 }} /> Değiştir
       </Link>
 
-      <h1 className="display" style={{ fontSize: "clamp(30px,5vw,40px)", margin: "0 0 10px" }}>Doğru anladık mı?</h1>
-      <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--color-muted)", margin: "0 0 28px" }}>“{taslak.cumle}”</p>
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0">
+          <h1 className="display" style={{ fontSize: "clamp(30px,5vw,40px)", margin: "0 0 10px" }}>Doğru anladık mı?</h1>
+          <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--color-muted)", margin: "0 0 28px" }}>“{taslak.cumle}”</p>
 
-      <section className="panel mb-5 p-6">
-        <TalepDuzenleyici taslak={taslak} onChange={setTaslak} />
-      </section>
+          <section className="panel mb-5 p-6">
+            <TalepDuzenleyici taslak={taslak} onChange={setTaslak} />
+          </section>
 
-      <section className="panel mb-6 p-6">
-        <h2 style={{ fontSize: 15.5, fontWeight: 600, margin: "0 0 6px", color: "var(--color-cream)" }}>Bütçenizi nasıl doğrulayalım?</h2>
-        <p style={{ fontSize: 13, lineHeight: 1.6, color: "var(--color-muted)", margin: "0 0 16px" }}>
-          Emlakçılar yalnızca doğrulanmış taleplere teklif verir. Belgeniz kimseyle paylaşılmaz; doğrulandıktan sonra silinir.
-        </p>
+          <section className="panel mb-6 p-6">
+            <h2 style={{ fontSize: 15.5, fontWeight: 600, margin: "0 0 6px", color: "var(--color-cream)" }}>Bütçenizi nasıl doğrulayalım?</h2>
+            <p style={{ fontSize: 13, lineHeight: 1.6, color: "var(--color-muted)", margin: "0 0 16px" }}>
+              Emlakçılar yalnızca doğrulanmış taleplere teklif verir. Belgeniz kimseyle paylaşılmaz; doğrulandıktan sonra silinir.
+            </p>
 
-        <Radio.Group value={yol} onChange={(e) => setYol(e.target.value)} className="flex w-full flex-col gap-2.5">
-          <label
-            className="flex cursor-pointer items-start gap-3 rounded-xl px-4 py-3.5"
-            style={{ background: yol === "banka" ? "var(--accent-wash)" : "var(--color-surface-2)", border: `1px solid ${yol === "banka" ? "var(--accent-line)" : "var(--color-line)"}` }}
-          >
-            <Radio value="banka" style={{ marginTop: 2 }} />
-            <div className="flex-1">
-              <div className="flex items-center gap-2" style={{ fontSize: 14, fontWeight: 500, color: "var(--color-cream)" }}>
-                <BankOutlined style={{ color: "var(--color-gold)" }} /> Banka referans mektubu
-              </div>
-              {yol === "banka" && (
-                <div className="mt-3">
-                  {belge ? (
-                    <span className="num inline-flex items-center gap-2" style={{ fontSize: 13, color: "var(--color-verified)" }}>
-                      <CheckCircleFilled /> referans-mektubu.pdf alındı
-                    </span>
-                  ) : (
-                    <Upload beforeUpload={() => { setBelge(true); return false; }} showUploadList={false}>
-                      <Button icon={<UploadOutlined />}>Belge yükle</Button>
-                    </Upload>
-                  )}
+            <Radio.Group value={yol} onChange={(e) => setYol(e.target.value)} className="flex w-full flex-col gap-2.5">
+              <YolSecenegi deger="banka" secili={yol} ikon={<BankOutlined />} baslik="Banka referans mektubu">
+                {yol === "banka" && (
+                  <div className="mt-3">
+                    {belge ? (
+                      <span className="num inline-flex items-center gap-2" style={{ fontSize: 13, color: "var(--color-verified)" }}>
+                        <CheckCircleFilled /> referans-mektubu.pdf alındı
+                      </span>
+                    ) : (
+                      <Upload beforeUpload={() => { setBelge(true); return false; }} showUploadList={false}>
+                        <Button icon={<UploadOutlined />}>Belge yükle</Button>
+                      </Upload>
+                    )}
+                  </div>
+                )}
+              </YolSecenegi>
+
+              <YolSecenegi deger="emlakci" secili={yol} ikon={<TeamOutlined />} baslik="Çalıştığım bir emlakçı var">
+                <div style={{ fontSize: 12.5, lineHeight: 1.6, color: "var(--color-muted)", marginTop: 4 }}>
+                  Talebi sizin adınıza o işletir ve bütçenize kefil olur. Gelen teklifler önce ona düşer.
                 </div>
-              )}
-            </div>
-          </label>
+              </YolSecenegi>
+            </Radio.Group>
+          </section>
 
-          <label
-            className="flex cursor-pointer items-start gap-3 rounded-xl px-4 py-3.5"
-            style={{ background: yol === "emlakci" ? "var(--accent-wash)" : "var(--color-surface-2)", border: `1px solid ${yol === "emlakci" ? "var(--accent-line)" : "var(--color-line)"}` }}
-          >
-            <Radio value="emlakci" style={{ marginTop: 2 }} />
-            <div className="flex-1">
-              <div className="flex items-center gap-2" style={{ fontSize: 14, fontWeight: 500, color: "var(--color-cream)" }}>
-                <TeamOutlined style={{ color: "var(--color-gold)" }} /> Çalıştığım bir emlakçı var
-              </div>
-              <div style={{ fontSize: 12.5, lineHeight: 1.6, color: "var(--color-muted)", marginTop: 4 }}>
-                Talebi sizin adınıza o açar ve bütçenize kefil olur. Gelen teklifler önce ona düşer.
-              </div>
-            </div>
-          </label>
-        </Radio.Group>
-      </section>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span style={{ fontSize: 12.5, color: "var(--color-faint)" }}>{durumMetni}</span>
+            <Button type="primary" size="large" disabled={!hazir} onClick={ilet}>Talebi ilet</Button>
+          </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <span style={{ fontSize: 12.5, color: "var(--color-faint)" }}>
-          {eksik.length ? `Eksik: ${eksik.join(", ")}` : yol === "banka" && !belge ? "Devam etmek için belgeyi yükleyin" : "Talebiniz 90 gün açık kalır"}
-        </span>
-        <Button type="primary" size="large" disabled={!hazir} onClick={ilet}>
-          Talebi ilet
-        </Button>
+          <p className="mt-8" style={{ fontSize: 11.5, color: "var(--color-faint)" }}>
+            Prototip: cümle kural tabanlı ayrıştırılıyor. Gerçek üründe bunu bir yapay zekâ modeli yapacak.
+          </p>
+        </div>
+
+        <YanBilgi
+          baslik="Sonra ne olacak"
+          adimlar={[
+            "Bütçeniz doğrulanır; belgeniz doğrulandıktan sonra silinir.",
+            "Talebiniz adınız olmadan bölgedeki doğrulanmış emlakçılara iletilir.",
+            "En fazla üç emlakçı teklif getirebilir. Şartlarınızdan birine uymayan teklif, farkı baştan söyler.",
+            "Beğendiğiniz teklifin iletişimini siz açarsınız. Açmadığınız emlakçı sizi hiç görmez.",
+          ]}
+          altNot="Talebiniz 90 gün açık kalır; istediğiniz an kapatabilirsiniz."
+        />
       </div>
-
-      <p className="mt-8" style={{ fontSize: 11.5, color: "var(--color-faint)" }}>
-        Prototip: cümle kural tabanlı ayrıştırılıyor. Gerçek üründe bunu bir yapay zekâ modeli yapacak.
-      </p>
-    </div>
+    </Kap>
   );
 }
 

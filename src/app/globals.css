@@ -131,7 +131,11 @@ body {
 
 ::selection { background: var(--accent-wash-2); color: var(--color-cream); }
 
-/* Preflight kapalı: yerel form öğeleri sayfa fontunu kendiliğinden devralmaz */
+/* Preflight kapalı olduğu için onun sağladığı iki temel kuralı elle veriyoruz:
+   1) border-box — yoksa w-full + padding olan her kutu %100'den geniş olur ve
+      sayfa dar ekranlarda yatay taşar.
+   2) yerel form öğeleri sayfa fontunu kendiliğinden devralmaz. */
+*, *::before, *::after { box-sizing: border-box; }
 button { font-family: inherit; }
 
 /* Tema geçişini yumuşat — ama kullanıcı hareketi azaltmayı seçtiyse hayır */

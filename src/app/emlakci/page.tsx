@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Empty, Segmented, Select, Switch } from "antd";
 import { useDemo } from "@/lib/demo-store";
+import { KAP } from "@/components/kap";
 import { MUSTERI_TALEPLERIM, PORTFOYUM } from "@/lib/data";
 import { KOLTUK, portfoyUyumu } from "@/lib/eslesme";
 import { BOLGELER, talepBolgesi } from "@/lib/bolgeler";
@@ -12,15 +13,15 @@ import EmlakciTalepKarti from "@/components/emlakci-talep-karti";
 type Siralama = "uyum" | "yeni" | "butce" | "bitis";
 
 export default function EmlakciAkis() {
-  const { tumTalepler, yeniTalepler, koltukDolu, gonderilenler } = useDemo();
+  const { tumTalepler, musteriTalepIdleri, koltukDolu, gonderilenler } = useDemo();
   const [bolge, setBolge] = useState<Bolge | "hepsi">("hepsi");
   const [sadeceUyan, setSadeceUyan] = useState(false);
   const [siralama, setSiralama] = useState<Siralama>("uyum");
 
   // Kendi müşterilerimin talepleri akışta görünmez, panelde durur
   const kendiminkiler = useMemo(
-    () => new Set([...MUSTERI_TALEPLERIM, ...yeniTalepler.filter((t) => t.acan === "emlakci").map((t) => t.id)]),
-    [yeniTalepler]
+    () => new Set([...MUSTERI_TALEPLERIM, ...musteriTalepIdleri]),
+    [musteriTalepIdleri]
   );
 
   const liste = useMemo(() => {
@@ -62,7 +63,7 @@ export default function EmlakciAkis() {
   const acik = tumTalepler.filter((t) => !kendiminkiler.has(t.id)).length;
 
   return (
-    <div className="mx-auto max-w-[1200px] px-5 py-10">
+    <div className={`${KAP} py-10`}>
       <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
         <div>
           <h1 className="display" style={{ fontSize: "clamp(30px,4vw,42px)", margin: "0 0 8px" }}>Talepler</h1>
